@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>יצירת עבודת שורשים</title>
+    <title>יצירת עבודת שורשים חדשה</title>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -14,7 +14,7 @@
             min-height: 100vh;
             background-color: #f4f4f4;
             margin: 0;
-            direction: rtl; /* Ensure RTL for Hebrew */
+            direction: rtl;
         }
         .container {
             background-color: #fff;
@@ -22,7 +22,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             text-align: center;
-            width: 400px;
+            width: 450px;
         }
         h1 {
             color: #333;
@@ -33,6 +33,7 @@
             margin-bottom: 10px;
             font-size: 1.1em;
             color: #555;
+            text-align: right;
         }
         input[type="text"] {
             width: calc(100% - 20px);
@@ -41,7 +42,7 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 1em;
-            text-align: right; /* Align text to the right for Hebrew input */
+            text-align: right;
         }
         button {
             background-color: #007bff;
@@ -56,47 +57,127 @@
         button:hover {
             background-color: #0056b3;
         }
-        .error-message {
-            color: red;
-            margin-top: 10px;
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            text-align: center;
+            display: none; /* Hidden by default */
+        }
+        .message-box button {
+            margin-top: 15px;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
         }
     </style>
+    <script type="module">
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlyDbpwcBcWvFnvYHb84dMEpaQFTjv-HY",
+            authDomain: "tester-69fa9.firebaseapp.com",
+            projectId: "tester-69fa9",
+            storageBucket: "tester-69fa9.firebasestorage.app",
+            messagingSenderId: "378563229004",
+            appId: "1:378563229004:web:5136b724eb84fd00e44be9",
+            measurementId: "G-BFJ1QQM3MS"
+        };
+        
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Function to show a custom message box instead of alert()
+        function showMessage(message, callback = null) {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            const messageButton = document.getElementById('messageButton');
+
+            messageText.textContent = message;
+            messageBox.style.display = 'block';
+
+            messageButton.onclick = function() {
+                messageBox.style.display = 'none';
+                if (callback) {
+                    callback();
+                }
+            };
+        }
+
+        window.createWork = async function() {
+            const childFirstNameEnglish = document.getElementById('childFirstNameEnglish').value.trim();
+            const childLastNameEnglish = document.getElementById('childLastNameEnglish').value.trim();
+            
+            if (!childFirstNameEnglish || !childLastNameEnglish) {
+                showMessage('אנא הזן גם שם פרטי וגם שם משפחה באנגלית.');
+                return;
+            }
+
+            // Combine first and last name for a unique ID, e.g., "Amit-Matyas"
+            const childId = `${childFirstNameEnglish}-${childLastNameEnglish}`;
+
+            // Basic validation for English letters, numbers, underscore, hyphen
+            if (!/^[a-zA-Z0-9_-]+$/.test(childId)) {
+                showMessage('שם הילד באנגלית יכול להכיל אותיות באנגלית, מספרים, קו תחתון ומקף בלבד.');
+                return;
+            }
+
+            try {
+                const docRef = doc(db, "works", childId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    // If document already exists, just redirect to its admin page
+                    showMessage('עבודה עם שם זה כבר קיימת. מועבר לעמוד הניהול הקיים.', function() {
+                        window.location.href = `/${childId}/admin`; // Uses rewrite rule
+                    });
+                } else {
+                    // Create a new document in Firestore with basic structure
+                    await setDoc(docRef, {
+                        childFirstNameEnglish: childFirstNameEnglish,
+                        childLastNameEnglish: childLastNameEnglish,
+                        childFirstNameHebrew: "", // Will be set in admin page
+                        childLastNameHebrew: "", // Will be set in admin page
+                        sections: [] // Will be populated in admin page
+                    });
+                    showMessage('עבודה נוצרה בהצלחה! מועבר לעמוד הניהול.', function() {
+                        window.location.href = `/${childId}/admin`; // Uses rewrite rule
+                    });
+                }
+            } catch (e) {
+                console.error("Error creating or accessing document: ", e);
+                showMessage('שגיאה ביצירת העבודה או בגישה אליה. אנא נסה שוב מאוחר יותר.');
+            }
+        };
+    </script>
 </head>
 <body>
     <div class="container">
         <h1>יצירת עבודת שורשים חדשה</h1>
-        <label for="childNameEnglish">הכנס שם הילד באנגלית (לדוגמה: David):</label>
-        <input type="text" id="childNameEnglish" placeholder="שם באנגלית" oninput="this.value = this.value.replace(/[^a-zA-Z]/g, '')">
+        <label for="childFirstNameEnglish">הכנס שם פרטי באנגלית (לדוגמה: Amit):</label>
+        <input type="text" id="childFirstNameEnglish" placeholder="שם פרטי באנגלית" oninput="this.value = this.value.replace(/[^a-zA-Z0-9_-]/g, '')">
+        
+        <label for="childLastNameEnglish">הכנס שם משפחה באנגלית (לדוגמה: Matyas):</label>
+        <input type="text" id="childLastNameEnglish" placeholder="שם משפחה באנגלית" oninput="this.value = this.value.replace(/[^a-zA-Z0-9_-]/g, '')">
+        
         <button onclick="createWork()">צור עבודה</button>
-        <div id="errorMessage" class="error-message"></div>
     </div>
 
-    <script>
-        function createWork() {
-            const childNameEnglish = document.getElementById('childNameEnglish').value.trim();
-            const errorMessageDiv = document.getElementById('errorMessage');
-
-            if (!childNameEnglish) {
-                errorMessageDiv.textContent = 'אנא הזן שם באנגלית.';
-                return;
-            }
-
-            errorMessageDiv.textContent = ''; // Clear previous errors
-
-            // In a real application, you would send this to a backend server.
-            // The backend would then:
-            // 1. Create a directory named after childNameEnglish.
-            // 2. Create index.html and admin.html files inside that directory.
-            // 3. Redirect the user to the admin page.
-
-            // For demonstration, we'll simulate redirection to the admin page
-            // and pass the English name via localStorage for this example.
-            localStorage.setItem('currentChildEnglishName', childNameEnglish);
-            window.location.href = `admin.html?name=${childNameEnglish}`;
-            // In a real scenario, the backend would handle the file creation and then redirect.
-            // Example backend route: /create-child-work?name=David
-            // This would then redirect to /David/admin.html
-        }
-    </script>
+    <div id="messageBox" class="message-box">
+        <p id="messageText"></p>
+        <button id="messageButton">אישור</button>
+    </div>
 </body>
 </html>
