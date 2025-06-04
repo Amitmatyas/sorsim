@@ -442,16 +442,7 @@
                 currentChildId = displayMatch[1];
                 await renderDisplayView(currentChildId);
             } else {
-                contentDiv.innerHTML = `
-                    <div class="container" style="padding: 50px;">
-                        <h1>שגיאה 404 - עמוד לא נמצא</h1>
-                        <p>העמוד שחיפשת לא קיים. אנא וודא את הכתובת.</p>
-                        <button onclick="navigateHash('/')">חזור לעמוד הבית</button>
-                    </div>
-                `;
-                document.getElementById('pageTitle').textContent = '404 - עמוד לא נמצא';
-            }
-        }
+window.location.href = '/404.html'; // Redirects directly to the 404.html page
         function navigateHash(path) {
             window.location.hash = path;
         }
