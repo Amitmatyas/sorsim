@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>העלאת תמונה ל-Cloudinary</title>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Heebo', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+            direction: rtl;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 500px;
+            max-width: 90%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 25px;
+        }
+        input[type="file"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+            text-align: right;
+            cursor: pointer;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .status-message {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #555;
+        }
+        .uploaded-image-preview {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: none; /* מוסתר כברירת מחדל */
+        }
+        .image-link-container {
+            margin-top: 20px;
+            text-align: left; /* יישור לשמאל עבור קישור */
+            direction: ltr; /* כיווניות משמאל לימין עבור קישור */
+            word-break: break-all; /* שבירת מילים ארוכות */
+        }
+        .image-link-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1em;
+            color: #555;
+            text-align: right; /* יישור לימין עבור התווית */
+            direction: rtl; /* כיווניות לימין עבור התווית */
+        }
+        .image-link-container input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9em;
+            cursor: text;
+            text-align: left; /* יישור לשמאל עבור הקלט */
+            direction: ltr; /* כיווניות משמאל לימין עבור הקלט */
+        }
+        .copy-button {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .copy-button:hover {
+            background-color: #0056b3;
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 2s linear infinite;
+            margin-left: 10px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* סגנונות לתיבת הודעות מותאמת אישית */
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            text-align: center;
+            display: none;
+        }
+        .message-box button {
+            margin-top: 15px;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>העלאת תמונה ל-Cloudinary</h1>
+        <input type="file" id="imageFile" accept="image/*">
+        <button onclick="uploadImage()">העלה תמונה</button>
+        
+        <div class="status-message" id="statusMessage"></div>
+        
+        <img src="" alt="תמונה שהועלתה" class="uploaded-image-preview" id="uploadedImagePreview">
+        
+        <div class="image-link-container" id="imageLinkContainer" style="display: none;">
+            <label for="imageLink">קישור ישיר לתמונה:</label>
+            <input type="text" id="imageLink" readonly>
+            <button class="copy-button" onclick="copyToClipboard()">העתק קישור</button>
+        </div>
+    </div>
+
+    <!-- תיבת הודעות מותאמת אישית -->
+    <div id="messageBox" class="message-box">
+        <p id="messageText"></p>
+        <button id="messageButton">אישור</button>
+    </div>
+
+    <script>
+        // הגדרות Cloudinary - החלף בפרטים שלך!
+        const CLOUDINARY_CLOUD_NAME = "dxvltuaae"; // <-- שם הענן שלך
+        const CLOUDINARY_UPLOAD_PRESET = "ml_default"; // <-- שם ה-Upload Preset שלך
+
+        // פונקציה להצגת תיבת הודעה מותאמת אישית
+        function showMessage(message, callback = null) {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            const messageButton = document.getElementById('messageButton');
+
+            messageText.textContent = message;
+            messageBox.style.display = 'block';
+
+            messageButton.onclick = function() {
+                messageBox.style.display = 'none';
+                if (callback) {
+                    callback();
+                }
+            };
+        }
+
+        async function uploadImage() {
+            const fileInput = document.getElementById('imageFile');
+            const statusMessage = document.getElementById('statusMessage');
+            const uploadedImagePreview = document.getElementById('uploadedImagePreview');
+            const imageLinkContainer = document.getElementById('imageLinkContainer');
+            const imageLinkInput = document.getElementById('imageLink');
+
+            uploadedImagePreview.style.display = 'none';
+            imageLinkContainer.style.display = 'none';
+            imageLinkInput.value = '';
+            statusMessage.style.color = '#555';
+            statusMessage.innerHTML = '';
+
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showMessage('אנא בחר קובץ תמונה להעלאה.');
+                return;
+            }
+
+            if (!CLOUDINARY_CLOUD_NAME || CLOUDINARY_CLOUD_NAME === "YOUR_CLOUDINARY_CLOUD_NAME" ||
+                !CLOUDINARY_UPLOAD_PRESET || CLOUDINARY_UPLOAD_PRESET === "YOUR_CLOUDINARY_UPLOAD_PRESET") {
+                showMessage('שגיאה: אנא הגדר את CLOUDINARY_CLOUD_NAME ו-CLOUDINARY_UPLOAD_PRESET בקוד.');
+                return;
+            }
+
+            statusMessage.innerHTML = '<span class="loading-spinner"></span> מעלה תמונה...';
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+            try {
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.secure_url) {
+                    uploadedImagePreview.src = data.secure_url;
+                    uploadedImagePreview.style.display = 'block';
+                    imageLinkInput.value = data.secure_url;
+                    imageLinkContainer.style.display = 'block';
+                    statusMessage.textContent = 'העלאה הושלמה בהצלחה!';
+                    statusMessage.style.color = 'green';
+                } else {
+                    console.error('Cloudinary upload error:', data);
+                    showMessage(`שגיאה בהעלאת התמונה: ${data.error ? data.error.message : 'שגיאה לא ידועה'}`);
+                    statusMessage.textContent = 'שגיאה בהעלאה.';
+                    statusMessage.style.color = 'red';
+                }
+            } catch (error) {
+                console.error('Network or unexpected error:', error);
+                showMessage('שגיאה בתקשורת עם שרת Cloudinary. אנא נסה שוב.');
+                statusMessage.textContent = 'שגיאה בהעלאה.';
+                statusMessage.style.color = 'red';
+            }
+        }
+
+        function copyToClipboard() {
+            const imageLinkInput = document.getElementById('imageLink');
+            imageLinkInput.select();
+            imageLinkInput.setSelectionRange(0, 99999); // עבור מכשירים ניידים
+            document.execCommand('copy');
+            showMessage('הקישור הועתק ללוח הגזירים!');
+        }
+    </script>
+</body>
+</html>
