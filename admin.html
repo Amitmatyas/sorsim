@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>עמוד ניהול עבודת שורשים</title>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Heebo', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            direction: rtl;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+        .main-container {
+            display: flex;
+            justify-content: flex-start;
+            padding: 20px;
+            gap: 20px;
+        }
+        .sidebar {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            flex-shrink: 0;
+        }
+        .sidebar h2 {
+            color: #333;
+            margin-top: 0;
+            text-align: center;
+        }
+        .sidebar button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #e9e9e9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            text-align: right;
+            transition: background-color 0.3s ease;
+        }
+        .sidebar button:hover {
+            background-color: #dcdcdc;
+        }
+        .content {
+            flex-grow: 1;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .content h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+            color: #555;
+        }
+        .input-group input[type="text"],
+        .input-group textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+            box-sizing: border-box;
+            text-align: right;
+            font-family: 'Heebo', sans-serif;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 1.5em;
+            color: #333;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .section-field {
+            text-align: right;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .section-field label {
+            margin-left: 10px;
+            flex-shrink: 0;
+            width: 100px;
+        }
+        .section-field input[type="text"] {
+            flex-grow: 1;
+        }
+        .custom-section-toolbar {
+            text-align: right;
+            margin-bottom: 10px;
+        }
+        .custom-section-toolbar button {
+            margin-left: 5px;
+            padding: 8px 12px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .save-button {
+            background-color: #28a745;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: block;
+            width: fit-content;
+            margin: 30px auto 0 auto;
+            transition: background-color 0.3s ease;
+        }
+        .save-button:hover {
+            background-color: #218838;
+        }
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            text-align: center;
+            display: none; /* Hidden by default */
+        }
+        .message-box button {
+            margin-top: 15px;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .action-buttons button {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons .view-button {
+            background-color: #6c757d; /* Grey for view */
+            color: white;
+            border: none;
+        }
+        .action-buttons .view-button:hover {
+            background-color: #5a6268;
+        }
+    </style>
+    <script type="module">
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlyDbpwcBcWvFnvYHb84dMEpaQFTjv-HY",
+            authDomain: "tester-69fa9.firebaseapp.com",
+            projectId: "tester-69fa9",
+            storageBucket: "tester-69fa9.firebasestorage.app",
+            messagingSenderId: "378563229004",
+            appId: "1:378563229004:web:5136b724eb84fd00e44be9",
+            measurementId: "G-BFJ1QQM3MS"
+        };
+        
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let childEnglishId = ''; // This will store the child's English ID from the URL
+
+        // Function to show a custom message box instead of alert()
+        function showMessage(message, callback = null) {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            const messageButton = document.getElementById('messageButton');
+
+            messageText.textContent = message;
+            messageBox.style.display = 'block';
+
+            messageButton.onclick = function() {
+                messageBox.style.display = 'none';
+                if (callback) {
+                    callback();
+                }
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Extract child ID from URL (e.g., /Amit-Matyas/admin -> childEnglishId = "Amit-Matyas")
+            const pathSegments = window.location.pathname.split('/').filter(segment => segment);
+            if (pathSegments.length > 0) {
+                // If the last segment is 'admin', the ID is the one before it
+                if (pathSegments[pathSegments.length - 1] === 'admin') {
+                    childEnglishId = pathSegments[pathSegments.length - 2];
+                } else {
+                    // If 'admin' is not the last segment, assume it's the ID itself (e.g., direct access to /childId)
+                    childEnglishId = pathSegments[pathSegments.length - 1];
+                }
+            }
+
+            if (!childEnglishId) {
+                showMessage('שגיאה: לא נמצא מזהה ילד בכתובת ה-URL. אנא חזור לעמוד היצירה.', function() {
+                    window.location.href = '/'; // Go back to main index.html for creation
+                });
+                return;
+            }
+
+            // Load data from Firestore
+            try {
+                const docRef = doc(db, "works", childEnglishId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('childFirstNameHebrew').value = data.childFirstNameHebrew || '';
+                    document.getElementById('childLastNameHebrew').value = data.childLastNameHebrew || '';
+                    updateChildNameDisplay(); // Update title immediately
+
+                    if (data.sections && Array.isArray(data.sections)) {
+                        data.sections.forEach(sectionData => {
+                            addSection(sectionData.type, sectionData.data);
+                        });
+                    }
+                } else {
+                    showMessage(`שגיאה: עבודה עם מזהה "${childEnglishId}" לא נמצאה. ייתכן שהיא נמחקה או שהכתובת שגויה.`, function() {
+                        window.location.href = '/'; // Go back to main index.html
+                    });
+                }
+            } catch (e) {
+                console.error("Error loading document: ", e);
+                showMessage('שגיאה בטעינת העבודה. אנא נסה שוב מאוחר יותר.', function() {
+                    window.location.href = '/'; // Go back to main index.html
+                });
+            }
+        });
+
+        function updateChildNameDisplay() {
+            const firstNameHebrew = document.getElementById('childFirstNameHebrew').value;
+            const lastNameHebrew = document.getElementById('childLastNameHebrew').value;
+            document.getElementById('childNameHebrewDisplay').textContent = `${firstNameHebrew} ${lastNameHebrew}`.trim();
+        }
+
+        let sectionCounter = 0; // To give unique IDs to sections
+
+        function addSection(type, savedData = {}) {
+            sectionCounter++;
+            const sectionsContainer = document.getElementById('sectionsContainer');
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'section-block';
+            sectionDiv.setAttribute('data-section-type', type);
+            sectionDiv.setAttribute('id', `section-${sectionCounter}`);
+
+            let sectionContent = '';
+
+            switch (type) {
+                case 'firstName':
+                    sectionContent = `
+                        <h3 class="section-title">שם פרטי</h3>
+                        <div class="section-field">
+                            <label>כינוי:</label>
+                            <input type="text" name="nickname" value="${savedData.nickname || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>מקור השם:</label>
+                            <input type="text" name="nameOrigin" value="${savedData.nameOrigin || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>סיפור מאחורי השם:</label>
+                            <textarea name="nameStory">${savedData.nameStory || ''}</textarea>
+                        </div>
+                    `;
+                    break;
+                case 'lastName':
+                    sectionContent = `
+                        <h3 class="section-title">שם משפחה</h3>
+                        <div class="section-field">
+                            <label>משמעות השם:</label>
+                            <input type="text" name="lastNameMeaning" value="${savedData.lastNameMeaning || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>מוצא המשפחה:</label>
+                            <input type="text" name="familyOrigin" value="${savedData.familyOrigin || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>תולדות המשפחה:</label>
+                            <textarea name="familyHistory">${savedData.familyHistory || ''}</textarea>
+                        </div>
+                    `;
+                    break;
+                case 'letterFromPast':
+                    sectionContent = `
+                        <h3 class="section-title">מכתב מהעבר</h3>
+                        <div class="section-field">
+                            <label>מאת:</label>
+                            <input type="text" name="letterFrom" value="${savedData.letterFrom || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>אל:</label>
+                            <input type="text" name="letterTo" value="${savedData.letterTo || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>תוכן המכתב:</label>
+                            <textarea name="letterContent" rows="10">${savedData.letterContent || ''}</textarea>
+                        </div>
+                    `;
+                    break;
+                case 'familyID':
+                    sectionContent = `
+                        <h3 class="section-title">ת"ז משפחתית</h3>
+                        <div class="section-field">
+                            <label>שם מלא:</label>
+                            <input type="text" name="fullName" value="${savedData.fullName || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>תאריך לידה:</label>
+                            <input type="text" name="dob" value="${savedData.dob || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>מקום לידה:</label>
+                            <input type="text" name="placeOfBirth" value="${savedData.placeOfBirth || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>עיסוק:</label>
+                            <input type="text" name="occupation" value="${savedData.occupation || ''}">
+                        </div>
+                    `;
+                    break;
+                case 'interview':
+                    sectionContent = `
+                        <h3 class="section-title">ראיון</h3>
+                        <div class="section-field">
+                            <label>שם המרואיין:</label>
+                            <input type="text" name="intervieweeName" value="${savedData.intervieweeName || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>קשר משפחתי:</label>
+                            <input type="text" name="relationship" value="${savedData.relationship || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>תוכן הראיון:</label>
+                            <textarea name="interviewContent" rows="10">${savedData.interviewContent || ''}</textarea>
+                        </div>
+                    `;
+                    break;
+                case 'custom':
+                    sectionContent = `
+                        <h3 class="section-title">מקטע מותאם אישית</h3>
+                        <div class="section-field">
+                            <label>כותרת מקטע:</label>
+                            <input type="text" name="customTitle" value="${savedData.customTitle || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>תוכן המקטע:</label>
+                            <div contenteditable="true" class="custom-content-editable" style="border: 1px solid #ddd; padding: 10px; min-height: 100px; flex-grow: 1; text-align: right; overflow-y: auto;">${savedData.customContent || ''}</div>
+                        </div>
+                        <div class="custom-section-toolbar">
+                            <button onclick="document.execCommand('bold', false, null)">מודגש</button>
+                            <button onclick="document.execCommand('italic', false, null)">נטוי</button>
+                            <button onclick="document.execCommand('underline', false, null)">קו תחתון</button>
+                            <button onclick="document.execCommand('insertUnorderedList', false, null)">רשימה</button>
+                            <button onclick="document.execCommand('insertOrderedList', false, null)">מספור</button>
+                        </div>
+                    `;
+                    break;
+                default:
+                    sectionContent = `<p>סוג מקטע לא ידוע.</p>`;
+            }
+
+            sectionDiv.innerHTML = `
+                ${sectionContent}
+                <button onclick="removeSection(this)" style="background-color: #dc3545; color: white; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">מחק מקטע</button>
+            `;
+            sectionsContainer.appendChild(sectionDiv);
+        }
+
+        window.removeSection = function(buttonElement) {
+            const sectionDiv = buttonElement.closest('.section-block');
+            if (sectionDiv) {
+                sectionDiv.remove();
+            }
+        };
+
+        window.saveWork = async function() {
+            if (!childEnglishId) {
+                showMessage('שגיאה: לא נמצא מזהה ילד לשמירה.');
+                return;
+            }
+
+            const childFirstNameHebrew = document.getElementById('childFirstNameHebrew').value.trim();
+            const childLastNameHebrew = document.getElementById('childLastNameHebrew').value.trim();
+
+            if (!childFirstNameHebrew || !childLastNameHebrew) {
+                showMessage('אנא הזן את השם הפרטי ושם המשפחה בעברית.');
+                return;
+            }
+
+            const sectionsData = [];
+            document.querySelectorAll('.section-block').forEach(sectionDiv => {
+                const type = sectionDiv.getAttribute('data-section-type');
+                const data = {};
+
+                if (type === 'custom') {
+                    data.customTitle = sectionDiv.querySelector('input[name="customTitle"]').value;
+                    data.customContent = sectionDiv.querySelector('.custom-content-editable').innerHTML; // Get HTML content
+                } else {
+                    sectionDiv.querySelectorAll('input, textarea').forEach(input => {
+                        data[input.name] = input.value;
+                    });
+                }
+                sectionsData.push({ type, data });
+            });
+
+            try {
+                const docRef = doc(db, "works", childEnglishId);
+                await updateDoc(docRef, {
+                    childFirstNameHebrew: childFirstNameHebrew,
+                    childLastNameHebrew: childLastNameHebrew,
+                    sections: sectionsData
+                });
+                showMessage('העבודה נשמרה בהצלחה!');
+            } catch (e) {
+                console.error("Error saving document: ", e);
+                showMessage('שגיאה בשמירת העבודה. אנא נסה שוב.');
+            }
+        };
+
+        window.viewWork = function() {
+            if (childEnglishId) {
+                window.open(`/${childEnglishId}`, '_blank'); // Opens in a new tab, uses rewrite rule
+            } else {
+                showMessage('אין עבודה לצפייה. אנא צור או טען עבודה קודם.');
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="header">
+        ניהול עבודת שורשים: <span id="childNameHebrewDisplay"></span>
+    </div>
+    <div class="main-container">
+        <div class="sidebar">
+            <h2>הוסף מקטעים</h2>
+            <button onclick="addSection('firstName')">שם פרטי</button>
+            <button onclick="addSection('lastName')">שם משפחה</button>
+            <button onclick="addSection('letterFromPast')">מכתב מהעבר</button>
+            <button onclick="addSection('familyID')">ת"ז משפחתית</button>
+            <button onclick="addSection('interview')">ראיון</button>
+            <button onclick="addSection('custom')">מקטע מותאם אישית</button>
+        </div>
+        <div class="content">
+            <h1>עריכת עבודת שורשים</h1>
+            <div class="input-group">
+                <label for="childFirstNameHebrew">שם פרטי הילד בעברית:</label>
+                <input type="text" id="childFirstNameHebrew" oninput="updateChildNameDisplay()">
+            </div>
+            <div class="input-group">
+                <label for="childLastNameHebrew">שם משפחה הילד בעברית:</label>
+                <input type="text" id="childLastNameHebrew" oninput="updateChildNameDisplay()">
+            </div>
+
+            <div id="sectionsContainer">
+                </div>
+
+            <div class="action-buttons">
+                <button class="save-button" onclick="saveWork()">שמור עבודה</button>
+                <button class="action-buttons view-button" onclick="viewWork()">צפה בעבודה</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="messageBox" class="message-box">
+        <p id="messageText"></p>
+        <button id="messageButton">אישור</button>
+    </div>
+</body>
+</html>
