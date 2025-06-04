@@ -6,13 +6,15 @@
     <title>עמוד ניהול עבודת שורשים</title>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* סגנונות כלליים לגוף העמוד */
         body {
             font-family: 'Heebo', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
-            direction: rtl;
+            direction: rtl; /* כיווניות מימין לשמאל לעברית */
         }
+        /* סגנונות לכותרת העליונה (header) */
         .header {
             background-color: #007bff;
             color: white;
@@ -21,25 +23,29 @@
             font-size: 1.8em;
             margin-bottom: 20px;
         }
+        /* סגנונות למיכל הראשי של התוכן */
         .main-container {
             display: flex;
-            justify-content: flex-start;
+            justify-content: flex-start; /* יישור לימין (בגלל RTL) */
             padding: 20px;
-            gap: 20px;
+            gap: 20px; /* רווח בין עמודות */
         }
+        /* סגנונות לסרגל הצד (sidebar) */
         .sidebar {
             background-color: #fff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             width: 250px;
-            flex-shrink: 0;
+            flex-shrink: 0; /* מונע מהסרגל להתכווץ */
         }
+        /* סגנונות לכותרת בסרגל הצד */
         .sidebar h2 {
             color: #333;
             margin-top: 0;
             text-align: center;
         }
+        /* סגנונות לכפתורים בסרגל הצד */
         .sidebar button {
             display: block;
             width: 100%;
@@ -50,45 +56,52 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 1em;
-            text-align: right;
+            text-align: right; /* יישור טקסט לימין */
             transition: background-color 0.3s ease;
         }
+        /* סגנונות לכפתורים בסרגל הצד במעבר עכבר */
         .sidebar button:hover {
             background-color: #dcdcdc;
         }
+        /* סגנונות לאזור התוכן הראשי */
         .content {
-            flex-grow: 1;
+            flex-grow: 1; /* מאפשר לאזור התוכן לתפוס את השטח הפנוי */
             background-color: #fff;
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+        /* סגנונות לכותרת בתוך אזור התוכן */
         .content h1 {
             text-align: center;
             color: #333;
             margin-bottom: 30px;
         }
+        /* סגנונות לקבוצות קלט (תווית ושדה) */
         .input-group {
             margin-bottom: 20px;
-            text-align: right;
+            text-align: right; /* יישור תוויות לימין */
         }
+        /* סגנונות לתוויות בתוך קבוצת קלט */
         .input-group label {
             display: block;
             margin-bottom: 8px;
             font-size: 1.1em;
             color: #555;
         }
+        /* סגנונות לשדות קלט טקסט ואזורי טקסט */
         .input-group input[type="text"],
         .input-group textarea {
-            width: calc(100% - 22px);
+            width: calc(100% - 22px); /* רוחב מלא פחות ריפוד וגבול */
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 1em;
-            box-sizing: border-box;
-            text-align: right;
-            font-family: 'Heebo', sans-serif;
+            box-sizing: border-box; /* כולל ריפוד וגבול ברוחב */
+            text-align: right; /* יישור טקסט לימין */
+            font-family: 'Heebo', sans-serif; /* וודא גופן Heebo גם ל-textareas */
         }
+        /* סגנונות לכותרת מקטע */
         .section-title {
             text-align: center;
             font-size: 1.5em;
@@ -98,25 +111,30 @@
             border-bottom: 2px solid #eee;
             padding-bottom: 10px;
         }
+        /* סגנונות לשדה בתוך מקטע */
         .section-field {
-            text-align: right;
+            text-align: right; /* יישור שדות לימין */
             margin-bottom: 15px;
             display: flex;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: flex-end; /* יישור תווית וקלט לימין */
         }
+        /* סגנונות לתווית בתוך שדה מקטע */
         .section-field label {
-            margin-left: 10px;
-            flex-shrink: 0;
-            width: 100px;
+            margin-left: 10px; /* רווח בין תווית לקלט */
+            flex-shrink: 0; /* מונע מהתווית להתכווץ */
+            width: 100px; /* רוחב קבוע לתוויות */
         }
+        /* סגנונות לשדה קלט בתוך שדה מקטע */
         .section-field input[type="text"] {
-            flex-grow: 1;
+            flex-grow: 1; /* מאפשר לקלט לתפוס את השטח הנותר */
         }
+        /* סגנונות לסרגל כלים של מקטע מותאם אישית */
         .custom-section-toolbar {
             text-align: right;
             margin-bottom: 10px;
         }
+        /* סגנונות לכפתורים בסרגל הכלים של מקטע מותאם אישית */
         .custom-section-toolbar button {
             margin-left: 5px;
             padding: 8px 12px;
@@ -126,6 +144,7 @@
             cursor: pointer;
             font-size: 0.9em;
         }
+        /* סגנונות לכפתור השמירה */
         .save-button {
             background-color: #28a745;
             color: white;
@@ -135,13 +154,15 @@
             cursor: pointer;
             font-size: 1.2em;
             display: block;
-            width: fit-content;
-            margin: 30px auto 0 auto;
+            width: fit-content; /* רוחב לפי התוכן */
+            margin: 30px auto 0 auto; /* ממורכז אופקית */
             transition: background-color 0.3s ease;
         }
+        /* סגנונות לכפתור השמירה במעבר עכבר */
         .save-button:hover {
             background-color: #218838;
         }
+        /* סגנונות לתיבת הודעות מותאמת אישית */
         .message-box {
             position: fixed;
             top: 50%;
@@ -153,8 +174,9 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             z-index: 1000;
             text-align: center;
-            display: none; /* Hidden by default */
+            display: none; /* מוסתר כברירת מחדל */
         }
+        /* סגנונות לכפתור בתיבת ההודעות */
         .message-box button {
             margin-top: 15px;
             background-color: #007bff;
@@ -164,12 +186,14 @@
             border-radius: 4px;
             cursor: pointer;
         }
+        /* סגנונות לכפתורי פעולה (שמירה, צפייה) */
         .action-buttons {
             display: flex;
             justify-content: center;
             gap: 15px;
             margin-top: 30px;
         }
+        /* סגנונות לכפתורי פעולה כלליים */
         .action-buttons button {
             padding: 12px 25px;
             font-size: 1.1em;
@@ -177,17 +201,20 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
+        /* סגנונות לכפתור הצפייה */
         .action-buttons .view-button {
-            background-color: #6c757d; /* Grey for view */
+            background-color: #6c757d; /* אפור לצפייה */
             color: white;
             border: none;
         }
+        /* סגנונות לכפתור הצפייה במעבר עכבר */
         .action-buttons .view-button:hover {
             background-color: #5a6268;
         }
     </style>
+    <!-- Firebase SDKs - ייבוא ספריות Firebase -->
     <script type="module">
-        // Your web app's Firebase configuration
+        // הגדרות Firebase של האפליקציה שלך
         const firebaseConfig = {
             apiKey: "AIzaSyDlyDbpwcBcWvFnvYHb84dMEpaQFTjv-HY",
             authDomain: "tester-69fa9.firebaseapp.com",
@@ -198,16 +225,17 @@
             measurementId: "G-BFJ1QQM3MS"
         };
         
+        // ייבוא פונקציות ספציפיות מ-Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Initialize Firebase
+        // אתחול Firebase
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db = getFirestore(app); // קבלת מופע של Firestore
 
-        let childEnglishId = ''; // This will store the child's English ID from the URL
+        let childEnglishId = ''; // ישמש לאחסון מזהה הילד (באנגלית) מה-URL
 
-        // Function to show a custom message box instead of alert()
+        // פונקציה להצגת תיבת הודעה מותאמת אישית
         function showMessage(message, callback = null) {
             const messageBox = document.getElementById('messageBox');
             const messageText = document.getElementById('messageText');
@@ -224,73 +252,79 @@
             };
         }
 
+        // פונקציה המופעלת כאשר המסמך נטען במלואו
         document.addEventListener('DOMContentLoaded', async function() {
-            // Extract child ID from URL (e.g., /Amit-Matyas/admin -> childEnglishId = "Amit-Matyas")
+            // חילוץ מזהה הילד מה-URL (לדוגמה: /Amit-Matyas/admin -> childEnglishId = "Amit-Matyas")
             const pathSegments = window.location.pathname.split('/').filter(segment => segment);
             if (pathSegments.length > 0) {
-                // If the last segment is 'admin', the ID is the one before it
+                // אם המקטע האחרון הוא 'admin', המזהה הוא המקטע שלפניו
                 if (pathSegments[pathSegments.length - 1] === 'admin') {
                     childEnglishId = pathSegments[pathSegments.length - 2];
                 } else {
-                    // If 'admin' is not the last segment, assume it's the ID itself (e.g., direct access to /childId)
+                    // אם 'admin' אינו המקטע האחרון, נניח שזהו המזהה עצמו
                     childEnglishId = pathSegments[pathSegments.length - 1];
                 }
             }
 
+            // אם לא נמצא מזהה ילד, הצג הודעה והפנה לעמוד היצירה הראשי
             if (!childEnglishId) {
                 showMessage('שגיאה: לא נמצא מזהה ילד בכתובת ה-URL. אנא חזור לעמוד היצירה.', function() {
-                    window.location.href = '/'; // Go back to main index.html for creation
+                    window.location.href = '/'; // חזרה ל-index.html הראשי
                 });
                 return;
             }
 
-            // Load data from Firestore
+            // טעינת נתונים מ-Firestore
             try {
-                const docRef = doc(db, "works", childEnglishId);
-                const docSnap = await getDoc(docRef);
+                const docRef = doc(db, "works", childEnglishId); // הפניה למסמך הספציפי
+                const docSnap = await getDoc(docRef); // קבלת תמונת מצב של המסמך
 
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
+                if (docSnap.exists()) { // אם המסמך קיים
+                    const data = docSnap.data(); // קבלת הנתונים מהמסמך
                     document.getElementById('childFirstNameHebrew').value = data.childFirstNameHebrew || '';
                     document.getElementById('childLastNameHebrew').value = data.childLastNameHebrew || '';
-                    updateChildNameDisplay(); // Update title immediately
+                    updateChildNameDisplay(); // עדכון כותרת העמוד מיד
 
+                    // טעינת המקטעים השמורים
                     if (data.sections && Array.isArray(data.sections)) {
                         data.sections.forEach(sectionData => {
                             addSection(sectionData.type, sectionData.data);
                         });
                     }
-                } else {
+                } else { // אם המסמך לא קיים
                     showMessage(`שגיאה: עבודה עם מזהה "${childEnglishId}" לא נמצאה. ייתכן שהיא נמחקה או שהכתובת שגויה.`, function() {
-                        window.location.href = '/'; // Go back to main index.html
+                        window.location.href = '/'; // חזרה ל-index.html הראשי
                     });
                 }
-            } catch (e) {
+            } catch (e) { // טיפול בשגיאות טעינה
                 console.error("Error loading document: ", e);
                 showMessage('שגיאה בטעינת העבודה. אנא נסה שוב מאוחר יותר.', function() {
-                    window.location.href = '/'; // Go back to main index.html
+                    window.location.href = '/'; // חזרה ל-index.html הראשי
                 });
             }
         });
 
+        // פונקציה לעדכון תצוגת שם הילד בעברית בכותרת
         function updateChildNameDisplay() {
             const firstNameHebrew = document.getElementById('childFirstNameHebrew').value;
             const lastNameHebrew = document.getElementById('childLastNameHebrew').value;
             document.getElementById('childNameHebrewDisplay').textContent = `${firstNameHebrew} ${lastNameHebrew}`.trim();
         }
 
-        let sectionCounter = 0; // To give unique IDs to sections
+        let sectionCounter = 0; // מונה למתן מזהים ייחודיים למקטעים
 
+        // פונקציה להוספת מקטע לעמוד
         function addSection(type, savedData = {}) {
             sectionCounter++;
             const sectionsContainer = document.getElementById('sectionsContainer');
             const sectionDiv = document.createElement('div');
-            sectionDiv.className = 'section-block';
-            sectionDiv.setAttribute('data-section-type', type);
-            sectionDiv.setAttribute('id', `section-${sectionCounter}`);
+            sectionDiv.className = 'section-block'; // קלאס לבלוק מקטע
+            sectionDiv.setAttribute('data-section-type', type); // שמירת סוג המקטע
+            sectionDiv.setAttribute('id', `section-${sectionCounter}`); // מזהה ייחודי למקטע
 
-            let sectionContent = '';
+            let sectionContent = ''; // תוכן ה-HTML של המקטע
 
+            // בניית תוכן המקטע לפי הסוג
             switch (type) {
                 case 'firstName':
                     sectionContent = `
@@ -405,6 +439,7 @@
                     sectionContent = `<p>סוג מקטע לא ידוע.</p>`;
             }
 
+            // הוספת תוכן המקטע וכפתור מחיקה
             sectionDiv.innerHTML = `
                 ${sectionContent}
                 <button onclick="removeSection(this)" style="background-color: #dc3545; color: white; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">מחק מקטע</button>
@@ -412,14 +447,17 @@
             sectionsContainer.appendChild(sectionDiv);
         }
 
+        // פונקציה למחיקת מקטע
         window.removeSection = function(buttonElement) {
-            const sectionDiv = buttonElement.closest('.section-block');
+            const sectionDiv = buttonElement.closest('.section-block'); // מציאת אלמנט המקטע הקרוב ביותר
             if (sectionDiv) {
-                sectionDiv.remove();
+                sectionDiv.remove(); // מחיקת המקטע מה-DOM
             }
         };
 
+        // פונקציה לשמירת העבודה ל-Firestore
         window.saveWork = async function() {
+            // ודא שיש מזהה ילד
             if (!childEnglishId) {
                 showMessage('שגיאה: לא נמצא מזהה ילד לשמירה.');
                 return;
@@ -428,44 +466,49 @@
             const childFirstNameHebrew = document.getElementById('childFirstNameHebrew').value.trim();
             const childLastNameHebrew = document.getElementById('childLastNameHebrew').value.trim();
 
+            // ודא שהוזנו שמות בעברית
             if (!childFirstNameHebrew || !childLastNameHebrew) {
                 showMessage('אנא הזן את השם הפרטי ושם המשפחה בעברית.');
                 return;
             }
 
-            const sectionsData = [];
+            const sectionsData = []; // מערך לאחסון נתוני המקטעים
+            // לולאה על כל המקטעים בעמוד
             document.querySelectorAll('.section-block').forEach(sectionDiv => {
                 const type = sectionDiv.getAttribute('data-section-type');
                 const data = {};
 
+                // איסוף נתונים לפי סוג המקטע
                 if (type === 'custom') {
                     data.customTitle = sectionDiv.querySelector('input[name="customTitle"]').value;
-                    data.customContent = sectionDiv.querySelector('.custom-content-editable').innerHTML; // Get HTML content
+                    data.customContent = sectionDiv.querySelector('.custom-content-editable').innerHTML; // קבלת תוכן HTML
                 } else {
                     sectionDiv.querySelectorAll('input, textarea').forEach(input => {
                         data[input.name] = input.value;
                     });
                 }
-                sectionsData.push({ type, data });
+                sectionsData.push({ type, data }); // הוספת המקטע למערך
             });
 
             try {
-                const docRef = doc(db, "works", childEnglishId);
+                const docRef = doc(db, "works", childEnglishId); // הפניה למסמך הספציפי
+                // עדכון המסמך ב-Firestore עם הנתונים החדשים
                 await updateDoc(docRef, {
                     childFirstNameHebrew: childFirstNameHebrew,
                     childLastNameHebrew: childLastNameHebrew,
                     sections: sectionsData
                 });
-                showMessage('העבודה נשמרה בהצלחה!');
-            } catch (e) {
+                showMessage('העבודה נשמרה בהצלחה!'); // הצגת הודעת הצלחה
+            } catch (e) { // טיפול בשגיאות שמירה
                 console.error("Error saving document: ", e);
                 showMessage('שגיאה בשמירת העבודה. אנא נסה שוב.');
             }
         };
 
+        // פונקציה לצפייה בעבודה
         window.viewWork = function() {
             if (childEnglishId) {
-                window.open(`/${childEnglishId}`, '_blank'); // Opens in a new tab, uses rewrite rule
+                window.open(`/${childEnglishId}`, '_blank'); // פתיחה בלשונית חדשה, שימוש בכלל ה-rewrite
             } else {
                 showMessage('אין עבודה לצפייה. אנא צור או טען עבודה קודם.');
             }
@@ -498,7 +541,8 @@
             </div>
 
             <div id="sectionsContainer">
-                </div>
+                <!-- מקטעים יתווספו כאן באופן דינמי -->
+            </div>
 
             <div class="action-buttons">
                 <button class="save-button" onclick="saveWork()">שמור עבודה</button>
@@ -507,6 +551,7 @@
         </div>
     </div>
 
+    <!-- תיבת הודעות מותאמת אישית -->
     <div id="messageBox" class="message-box">
         <p id="messageText"></p>
         <button id="messageButton">אישור</button>
