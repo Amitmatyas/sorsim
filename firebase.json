@@ -1,0 +1,20 @@
+{
+  "hosting": {
+    "public": ".",  // הגדרת תיקיית הבסיס כתיקייה הציבורית
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/:childId/admin",
+        "destination": "/admin.html"
+      },
+      {
+        "source": "/:childId",
+        "destination": "/display.html"
+      }
+    ]
+  }
+}
