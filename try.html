@@ -932,7 +932,6 @@
                                             <p><strong>סיפור סביב השם:</strong></p>
                                             <p>${section.data.firstNameStory || 'לא הוזן'}</p>
                                             <p><strong>כינוי חיבה:</strong> ${section.data.nicknameWho || 'לא הוזן'} ${section.data.nicknameWhy ? `כי ${section.data.nicknameWhy}` : ''}</p>
-                                            ${displayImage(section.data.firstNameSectionPhoto, 'תמונה נוספת')}
                                         </div>
                                     `;
                                     break;
@@ -945,7 +944,6 @@
                                             <p><strong>מאיזה שפה זה:</strong> ${section.data.lastNameLanguage || 'לא הוזן'}</p>
                                             <p><strong>סיפור משפחתי סביב השם:</strong></p>
                                             <p>${section.data.familyStoryAboutName || 'לא הוזן'}</p>
-                                            ${displayImage(section.data.lastNameSectionPhoto, 'תמונה')}
                                         </div>
                                     `;
                                     break;
@@ -954,7 +952,6 @@
                                         <h3>מכתב מהעבר</h3>
                                         <div class="section-content">
                                             <p>${section.data.letterContent || 'לא הוזן'}</p>
-                                            ${displayImage(section.data.letterFromPastPhoto, 'תמונה')}
                                         </div>
                                     `;
                                     break;
