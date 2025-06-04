@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - עבודת השורשים לא נמצאה</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❌</text></svg>">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@700&family=Heebo:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background: linear-gradient(135deg, #f0f8ff 0%, #e0f2f7 100%); /* Light blueish gradient */
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 40px 60px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            width: 90%;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center content horizontally */
+            opacity: 0; /* נתחיל עם אטימות 0 כדי שאנימציית הכניסה תהיה ראשונית */
+            transform: translateY(-50px);
+            animation: containerEnter 1s ease-out forwards;
+        }
+
+        @keyframes containerEnter {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo-container {
+            margin-bottom: 15px;
+            perspective: 800px; /* הגדלתי לפרספקטיבה עמוקה יותר */
+        }
+
+        .logo {
+            max-width: 220px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            opacity: 0;
+            transform: scale(0.5) rotateX(90deg); /* מתחיל קטן ומסתובב ב-X */
+            animation: logoBounceIn 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; /* אנימציית כניסה קפיצית */
+            animation-delay: 0.5s; /* עיכוב קל אחרי כניסת הקונטיינר */
+        }
+
+        @keyframes logoBounceIn {
+            0% { opacity: 0; transform: scale(0.5) rotateX(90deg); }
+            60% { opacity: 1; transform: scale(1.1) rotateX(-10deg); } /* קפיצה קטנה מעבר לגודל הנורמלי */
+            100% { opacity: 1; transform: scale(1) rotateX(0deg); }
+        }
+
+        h1 {
+            font-family: 'Rubik', sans-serif;
+            font-size: 9em;
+            color: #ff6f61; /* Energetic red-orange */
+            margin-top: 0;
+            margin-bottom: 10px;
+            text-shadow: 5px 5px #ffe0b2;
+            opacity: 0;
+            transform: scale(0.2);
+            animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* אנימציית פופ-אין */
+            animation-delay: 1.2s; /* עיכוב אחרי הלוגו */
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.2) rotate(-30deg); }
+            80% { opacity: 1; transform: scale(1.1) rotate(5deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+
+        h2 {
+            font-family: 'Rubik', sans-serif;
+            font-size: 2.5em;
+            color: #4a90e2; /* Bright blue */
+            margin-top: 0;
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateX(-100px);
+            animation: slideFromLeft 1s ease-out forwards; /* כניסה חלקה משמאל */
+            animation-delay: 1.5s; /* עיכוב אחרי ה-404 */
+        }
+
+        @keyframes slideFromLeft {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        p {
+            font-size: 1.3em;
+            line-height: 1.7;
+            margin-bottom: 40px;
+            color: #555;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInSlideUp 1s ease-out forwards; /* כניסה עם דעיכה והחלקה מלמטה */
+            animation-delay: 2s; /* עיכוב אחרי הכותרת הקטנה */
+        }
+
+        @keyframes fadeInSlideUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* חלקיקים מרחפים - נשארים כי הם מוסיפים לפוצץ */
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #a7d9ed; /* צבע הרקע הבהיר */
+            border-radius: 50%;
+            opacity: 0;
+            animation: floatAndFade 3s infinite;
+        }
+
+        @keyframes floatAndFade {
+            0% {
+                transform: translate(var(--x), var(--y)) scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.8;
+                transform: translate(calc(var(--x) + var(--dx)), calc(var(--y) + var(--dy))) scale(1);
+            }
+            100% {
+                transform: translate(calc(var(--x) + var(--final-dx)), calc(var(--y) + var(--final-dy))) scale(0);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img class="logo" src="https://i.postimg.cc/nVNHjMqs/httpsshop-super-pharm-co-ilcarehair-carehair-filling-Agiva-Volumiz.png" alt="לוגו האתר">
+        </div>
+        <h1>404</h1>
+        <h2>אופס! עמוד לא נמצא.</h2>
+        <p><strong>"עבודת השורשים שלך לא נמצאה!"</strong></p>
+        <p>נראה שהעמוד שחיפשת פשוט... נעלם! אולי הוא יצא לחקור את השורשים בעצמו. נסה לבדוק שוב את הקישור.</p>
+    </div>
+
+    <script>
+        // יצירת חלקיקים מרחפים
+        const container = document.querySelector('.container');
+        const numParticles = 30;
+
+        for (let i = 0; i < numParticles; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+
+            const x = Math.random() * container.offsetWidth;
+            const y = Math.random() * container.offsetHeight;
+            const dx = (Math.random() - 0.5) * 50;
+            const dy = (Math.random() - 0.5) * 50;
+            const finalDx = dx * 2;
+            const finalDy = dy * 2;
+            const delay = Math.random() * 2;
+
+            particle.style.setProperty('--x', `${x}px`);
+            particle.style.setProperty('--y', `${y}px`);
+            particle.style.setProperty('--dx', `${dx}px`);
+            particle.style.setProperty('--dy', `${dy}px`);
+            particle.style.setProperty('--final-dx', `${finalDx}px`);
+            particle.style.setProperty('--final-dy', `${finalDy}px`);
+            particle.style.animationDelay = `${delay}s`;
+
+            container.appendChild(particle);
+        }
+    </script>
+</body>
+</html>
