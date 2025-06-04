@@ -5,16 +5,7 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "/:childId/admin",
-        "destination": "/admin.html"
-      },
-      {
-        "source": "/:childId",
-        "destination": "/display.html"
-      }
     ]
+    // אין כאן בלוק rewrites, מכיוון שהניתוב יטופל ע"י Hash ב-JS
   }
 }
