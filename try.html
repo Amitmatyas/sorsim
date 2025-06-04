@@ -363,6 +363,21 @@
             text-align: right; /* Right-align interview text */
             direction: rtl;
         }
+        .image-with-title {
+            text-align: center; /* Center the image and title */
+        }
+        .image-with-title img {
+            max-width: 100%; /* Make image responsive */
+            max-height: 300px; /* Set a maximum height */
+            object-fit: contain; /* Maintain aspect ratio and fit within the container */
+            display: block; /* Remove extra space below image */
+            margin: 0 auto; /* Center the image horizontally */
+        }
+        .image-title {
+            font-size: 1.2em;
+            color: #555;
+            margin-top: 5px;
+        }
     </style>
     <!-- Firebase SDKs -->
     <script type="module">
@@ -683,6 +698,7 @@
                         <div class="section-field"><label>כינוי חיבה - למה:</label>
                             <input type="text" name="nicknameWhy" value="${savedData.nicknameWhy || ''}">
                         </div>
+                        ${createImageUploadField('firstNameSectionPhoto', 'העלאת תמונה', savedData.firstNameSectionPhoto)}
                     `;
                     break;
                 case 'lastName':
@@ -700,6 +716,7 @@
                         <div class="section-field"><label>סיפור משפחתי סביב השם:</label>
                             <textarea name="familyStoryAboutName">${savedData.familyStoryAboutName || ''}</textarea>
                         </div>
+                        ${createImageUploadField('lastNameSectionPhoto', 'העלאת תמונה', savedData.lastNameSectionPhoto)}
                     `;
                     break;
                 case 'letterFromPast':
@@ -735,11 +752,7 @@
                     break;
                 case 'custom':
                     sectionContent = `
-                        <h3 class="section-title">מקטע מותאם אישית</h3>
-                        <div class="section-field">
-                            <label>כותרת:</label>
-                            <input type="text" name="customTitle" value="${savedData.customTitle || ''}">
-                        </div>
+                        <h3 class="section-title">${savedData.customTitle ? savedData.customTitle : ''}</h3>
                         <div class="section-field" style="width:100%;">
                             <label>תוכן:</label>
                             <textarea name="customContent" rows="4" style="width:100%;">${savedData.customContent || ''}</textarea>
@@ -909,7 +922,12 @@
 
                             const displayImage = (url, altText) => {
                                 if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
-                                    return `<img src="${url}" alt="${altText}" onerror="this.style.display='none';">`;
+                                    return `
+                                        <div class="image-with-title">
+                                            <img src="${url}" alt="${altText}" style="max-width: 100%; max-height: 300px; object-fit: contain;">
+                                            <div class="image-title">${altText}</div>
+                                        </div>
+                                    `;
                                 }
                                 return '';
                             };
@@ -930,6 +948,7 @@
                                             <p><strong>סיפור סביב השם:</strong></p>
                                             <p>${section.data.firstNameStory || 'לא הוזן'}</p>
                                             <p><strong>כינוי חיבה:</strong> ${section.data.nicknameWho || 'לא הוזן'} ${section.data.nicknameWhy ? `כי ${section.data.nicknameWhy}` : ''}</p>
+                                            ${displayImage(section.data.firstNameSectionPhoto, 'תמונה נוספת')}
                                         </div>
                                     `;
                                     break;
@@ -942,6 +961,7 @@
                                             <p><strong>מאיזה שפה זה:</strong> ${section.data.lastNameLanguage || 'לא הוזן'}</p>
                                             <p><strong>סיפור משפחתי סביב השם:</strong></p>
                                             <p>${section.data.familyStoryAboutName || 'לא הוזן'}</p>
+                                            ${displayImage(section.data.lastNameSectionPhoto, 'תמונה')}
                                         </div>
                                     `;
                                     break;
@@ -950,6 +970,7 @@
                                         <h3>מכתב מהעבר</h3>
                                         <div class="section-content">
                                             <p>${section.data.letterContent || 'לא הוזן'}</p>
+                                            ${displayImage(section.data.letterFromPastPhoto, 'תמונה')}
                                         </div>
                                     `;
                                     break;
@@ -975,7 +996,7 @@
                                     break;
                                 case 'custom':
                                     contentHtml = `
-                                        <h3>${section.data.customTitle || 'מקטע מותאם אישית'}</h3>
+                                        ${section.data.customTitle ? `<h3>${section.data.customTitle}</h3>` : ''}
                                         <div class="section-content">
                                             ${section.data.customContent || 'אין תוכן למקטע זה.'}
                                             ${displayImage(section.data.customSectionPhoto, 'תמונה')}
