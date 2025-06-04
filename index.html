@@ -583,7 +583,7 @@
                     }
                 } else {
                     showMessage(`שגיאה: עבודה עם מזהה "${childId}" לא נמצאה. ייתכן שהיא נמחקה או שהכתובת שגויה.`, function() {
-                    navigateHash('/404.html'); // This line was changed
+                    window.location.href = '/404.html'; // This will navigate directly to 404.html
                     });
                 }
             } catch (e) {
