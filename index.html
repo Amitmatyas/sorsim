@@ -198,13 +198,14 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
+            flex-wrap: wrap; /* Allow wrapping for image inputs */
         }
         .section-field label {
             margin-left: 10px;
             flex-shrink: 0;
             width: 100px;
         }
-        .section-field input[type="text"] {
+        .section-field input[type="text"], .section-field textarea {
             flex-grow: 1;
         }
         .custom-section-toolbar {
@@ -258,6 +259,44 @@
             background-color: #5a6268;
         }
 
+        /* Image URL input specific styles */
+        .image-url-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; /* Align to the right for RTL */
+            margin-top: 10px;
+            width: 100%;
+        }
+        .image-url-container input[type="text"] {
+            width: 100%; /* Full width for URL input */
+            margin-top: 5px;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+        .image-preview {
+            max-width: 150px;
+            max-height: 150px;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+            border-radius: 4px;
+            object-fit: contain;
+            display: block; /* Ensure it takes its own line */
+        }
+        .preview-button {
+            background-color: #17a2b8;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .preview-button:hover {
+            background-color: #138496;
+        }
+
         /* Display view specific styles */
         .main-title {
             text-align: center;
@@ -278,7 +317,7 @@
             margin-bottom: 40px;
             padding: 20px;
             background-color: #fdfdfd;
-            border-left: 5px solid #eee;
+            border-right: 5px solid #eee; /* Changed from border-left to border-right */
             border-radius: 5px;
         }
         .section-display h3 {
@@ -303,6 +342,14 @@
         .section-content li {
             margin-bottom: 5px;
         }
+        .section-content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 15px auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
     </style>
     <!-- Firebase SDKs -->
     <script type="module">
@@ -311,7 +358,7 @@
             apiKey: "AIzaSyDlyDbpwcBcWvFnvYHb84dMEpaQFTjv-HY",
             authDomain: "tester-69fa9.firebaseapp.com",
             projectId: "tester-69fa9",
-            storageBucket: "tester-69fa9.firebasestorage.app",
+            storageBucket: "tester-69fa9.firebasestorage.app", // This is no longer used for image uploads but can remain
             messagingSenderId: "378563229004",
             appId: "1:378563229004:web:5136b724eb84fd00e44be9",
             measurementId: "G-BFJ1QQM3MS"
@@ -319,10 +366,13 @@
         
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // Removed Firebase Storage import: import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        // Removed Storage initialization: const storage = getStorage(app);
 
         let currentChildId = ''; // Stores the ID of the current child being viewed/edited
         let sectionCounter = 0; // To give unique IDs to sections in admin view
@@ -546,6 +596,23 @@
             sectionDiv.setAttribute('id', `section-${sectionCounter}`);
 
             let sectionContent = '';
+            
+            // Function to create an image URL input field
+            const createImageUrlField = (fieldName, labelText, savedUrl) => {
+                const inputId = `${fieldName}-${sectionCounter}`;
+                return `
+                    <div class="section-field">
+                        <label for="${inputId}">${labelText}:</label>
+                        <div class="image-url-container">
+                            <input type="text" id="${inputId}" name="${fieldName}" 
+                                placeholder="הדבק קישור לתמונה כאן (URL)" value="${savedUrl || ''}"
+                                oninput="updateImagePreview('${inputId}')">
+                            <button class="preview-button" onclick="updateImagePreview('${inputId}')">הצג תצוגה מקדימה</button>
+                            ${savedUrl ? `<img src="${savedUrl}" class="image-preview" alt="תמונה קיימת" id="preview-${inputId}">` : '<img src="" class="image-preview" alt="תצוגה מקדימה" style="display:none;" id="preview-${inputId}">'}
+                        </div>
+                    </div>
+                `;
+            };
 
             switch (type) {
                 case 'firstName':
@@ -557,11 +624,46 @@
                         </div>
                         <div class="section-field">
                             <label>מקור השם:</label>
-                            <input type="text" name="nameOrigin" value="${savedData.nameOrigin || ''}">
+                            <input type="text" name="firstNameOrigin" value="${savedData.firstNameOrigin || ''}">
                         </div>
                         <div class="section-field">
-                            <label>סיפור מאחורי השם:</label>
-                            <textarea name="nameStory">${savedData.nameStory || ''}</textarea>
+                            <label>משמעות השם:</label>
+                            <input type="text" name="firstNameMeaning" value="${savedData.firstNameMeaning || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>תאריך לידה (עברי):</label>
+                            <input type="text" name="birthDateHebrew" value="${savedData.birthDateHebrew || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>תאריך לידה (לועזי):</label>
+                            <input type="text" name="birthDateGregorian" value="${savedData.birthDateGregorian || ''}">
+                        </div>
+                        ${createImageUrlField('babyPhotoUrl', 'תמונה כתינוק', savedData.babyPhotoUrl)}
+                        ${createImageUrlField('britInvitationUrl', 'הזמנה לברית', savedData.britInvitationUrl)}
+                        ${createImageUrlField('birthCertificateUrl', 'תעודת לידה', savedData.birthCertificateUrl)}
+                        <div class="section-field">
+                            <label>מקום לידה (מדינה):</label>
+                            <input type="text" name="birthCountry" value="${savedData.birthCountry || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>מקום לידה (עיר):</label>
+                            <input type="text" name="birthCity" value="${savedData.birthCity || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>מקום לידה (בה"יח):</label>
+                            <input type="text" name="birthHospital" value="${savedData.birthHospital || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>סיפור סביב השם:</label>
+                            <textarea name="firstNameStory">${savedData.firstNameStory || ''}</textarea>
+                        </div>
+                        <div class="section-field">
+                            <label>כינוי חיבה (מי):</label>
+                            <input type="text" name="nicknameWho" value="${savedData.nicknameWho || ''}">
+                        </div>
+                        <div class="section-field">
+                            <label>כינוי חיבה (למה):</label>
+                            <textarea name="nicknameWhy">${savedData.nicknameWhy || ''}</textarea>
                         </div>
                     `;
                     break;
@@ -569,16 +671,20 @@
                     sectionContent = `
                         <h3 class="section-title">שם משפחה</h3>
                         <div class="section-field">
+                            <label>מקור השם:</label>
+                            <input type="text" name="lastNameOrigin" value="${savedData.lastNameOrigin || ''}">
+                        </div>
+                        <div class="section-field">
                             <label>משמעות השם:</label>
                             <input type="text" name="lastNameMeaning" value="${savedData.lastNameMeaning || ''}">
                         </div>
                         <div class="section-field">
-                            <label>מוצא המשפחה:</label>
-                            <input type="text" name="familyOrigin" value="${savedData.familyOrigin || ''}">
+                            <label>מאיזה שפה זה:</label>
+                            <input type="text" name="lastNameLanguage" value="${savedData.lastNameLanguage || ''}">
                         </div>
                         <div class="section-field">
-                            <label>תולדות המשפחה:</label>
-                            <textarea name="familyHistory">${savedData.familyHistory || ''}</textarea>
+                            <label>סיפור משפחתי סביב השם:</label>
+                            <textarea name="familyStoryAboutName">${savedData.familyStoryAboutName || ''}</textarea>
                         </div>
                     `;
                     break;
@@ -618,6 +724,7 @@
                             <label>עיסוק:</label>
                             <input type="text" name="occupation" value="${savedData.occupation || ''}">
                         </div>
+                        ${createImageUrlField('familyPhotoUrl', 'תמונה', savedData.familyPhotoUrl)}
                     `;
                     break;
                 case 'interview':
@@ -668,6 +775,25 @@
             sectionsContainer.appendChild(sectionDiv);
         };
 
+        // Function to update image preview when URL changes
+        window.updateImagePreview = function(inputId) {
+            const urlInput = document.getElementById(inputId);
+            const previewImg = document.getElementById(`preview-${inputId}`);
+            const imageUrl = urlInput.value.trim();
+
+            if (imageUrl && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
+                previewImg.src = imageUrl;
+                previewImg.style.display = 'block';
+                previewImg.onerror = () => {
+                    previewImg.style.display = 'none';
+                    showMessage('שגיאה: לא ניתן לטעון תמונה מהקישור שסופק. אנא וודא שהקישור תקין וישיר לתמונה.');
+                };
+            } else {
+                previewImg.style.display = 'none';
+                previewImg.src = ''; // Clear src
+            }
+        };
+
         // Helper for admin view: remove a section
         window.removeSection = function(buttonElement) {
             const sectionDiv = buttonElement.closest('.section-block');
@@ -696,14 +822,17 @@
                 const type = sectionDiv.getAttribute('data-section-type');
                 const data = {};
 
+                // Collect data for text inputs and textareas
+                sectionDiv.querySelectorAll('input[type="text"], textarea').forEach(input => {
+                    data[input.name] = input.value;
+                });
+                
+                // Special handling for custom content (contenteditable div)
                 if (type === 'custom') {
                     data.customTitle = sectionDiv.querySelector('input[name="customTitle"]').value;
                     data.customContent = sectionDiv.querySelector('.custom-content-editable').innerHTML;
-                } else {
-                    sectionDiv.querySelectorAll('input, textarea').forEach(input => {
-                        data[input.name] = input.value;
-                    });
                 }
+                
                 sectionsData.push({ type, data });
             });
 
@@ -724,7 +853,6 @@
         // Helper for admin view: view work (navigates to display view)
         window.viewWork = function() {
             if (currentChildId) {
-                // Open in a new tab to simulate a separate page, using the SPA router
                 window.open(`/#/${currentChildId}`, '_blank'); // Use hash navigation
             } else {
                 showMessage('אין עבודה לצפייה. אנא צור או טען עבודה קודם.');
@@ -762,15 +890,31 @@
                             sectionDiv.className = 'section-display';
                             let contentHtml = '';
                             
+                            // Helper to display image if URL exists and is valid
+                            const displayImage = (url, altText) => {
+                                if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+                                    return `<img src="${url}" alt="${altText}" onerror="this.style.display='none';">`;
+                                }
+                                return '';
+                            };
+
                             switch (section.type) {
                                 case 'firstName':
                                     contentHtml = `
                                         <h3>שם פרטי</h3>
                                         <div class="section-content">
                                             <p><strong>כינוי:</strong> ${section.data.nickname || 'לא הוזן'}</p>
-                                            <p><strong>מקור השם:</strong> ${section.data.nameOrigin || 'לא הוזן'}</p>
-                                            <p><strong>סיפור מאחורי השם:</strong></p>
-                                            <p>${section.data.nameStory || 'לא הוזן'}</p>
+                                            <p><strong>מקור השם:</strong> ${section.data.firstNameOrigin || 'לא הוזן'}</p>
+                                            <p><strong>משמעות השם:</strong> ${section.data.firstNameMeaning || 'לא הוזן'}</p>
+                                            <p><strong>תאריך לידה (עברי):</strong> ${section.data.birthDateHebrew || 'לא הוזן'}</p>
+                                            <p><strong>תאריך לידה (לועזי):</strong> ${section.data.birthDateGregorian || 'לא הוזן'}</p>
+                                            ${displayImage(section.data.babyPhotoUrl, 'תמונה כתינוק')}
+                                            ${displayImage(section.data.britInvitationUrl, 'הזמנה לברית')}
+                                            ${displayImage(section.data.birthCertificateUrl, 'תעודת לידה')}
+                                            <p><strong>מקום לידה:</strong> ${section.data.birthCountry || 'לא הוזן'}, ${section.data.birthCity || 'לא הוזן'}, ${section.data.birthHospital || 'לא הוזן'}</p>
+                                            <p><strong>סיפור סביב השם:</strong></p>
+                                            <p>${section.data.firstNameStory || 'לא הוזן'}</p>
+                                            <p><strong>כינוי חיבה:</strong> ${section.data.nicknameWho || 'לא הוזן'} מכנה כך ${section.data.nicknameWhy ? `כי ${section.data.nicknameWhy}` : ''}</p>
                                         </div>
                                     `;
                                     break;
@@ -778,10 +922,11 @@
                                     contentHtml = `
                                         <h3>שם משפחה</h3>
                                         <div class="section-content">
+                                            <p><strong>מקור השם:</strong> ${section.data.lastNameOrigin || 'לא הוזן'}</p>
                                             <p><strong>משמעות השם:</strong> ${section.data.lastNameMeaning || 'לא הוזן'}</p>
-                                            <p><strong>מוצא המשפחה:</strong> ${section.data.familyOrigin || 'לא הוזן'}</p>
-                                            <p><strong>תולדות המשפחה:</strong></p>
-                                            <p>${section.data.familyHistory || 'לא הוזן'}</p>
+                                            <p><strong>מאיזה שפה זה:</strong> ${section.data.lastNameLanguage || 'לא הוזן'}</p>
+                                            <p><strong>סיפור משפחתי סביב השם:</strong></p>
+                                            <p>${section.data.familyStoryAboutName || 'לא הוזן'}</p>
                                         </div>
                                     `;
                                     break;
@@ -804,6 +949,7 @@
                                             <p><strong>תאריך לידה:</strong> ${section.data.dob || 'לא הוזן'}</p>
                                             <p><strong>מקום לידה:</strong> ${section.data.placeOfBirth || 'לא הוזן'}</p>
                                             <p><strong>עיסוק:</strong> ${section.data.occupation || 'לא הוזן'}</p>
+                                            ${displayImage(section.data.familyPhotoUrl, 'תמונה משפחתית')}
                                         </div>
                                     `;
                                     break;
