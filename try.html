@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">עבודת שורשים</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌳</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧬</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -59,6 +59,7 @@
             text-align: right;
             box-sizing: border-box;
             font-family: 'Heebo', sans-serif;
+            direction: rtl; /* Right-align input fields */
         }
         button {
             background-color: #007bff;
@@ -307,6 +308,7 @@
             border-right: 5px solid #eee;
             border-radius: 5px;
             text-align: right;
+            direction: rtl; /* Right-align section display */
         }
         .section-display h3 {
             color: #0056b3;
@@ -320,9 +322,44 @@
         .section-content p {
             margin-bottom: 10px;
             font-size: 1.1em;
+            text-align: right; /* Right-align paragraphs */
         }
         .section-content strong {
             color: #333;
+        }
+        .qr-code-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            text-align: center;
+            display: none;
+        }
+        .qr-code-popup img {
+            max-width: 200px;
+            max-height: 200px;
+            margin-bottom: 10px;
+        }
+        .qr-code-popup button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #workLogo {
+            max-width: 200px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+        .interview-text {
+            white-space: pre-wrap; /* Preserve formatting, handle line breaks */
         }
     </style>
     <!-- Firebase SDKs -->
@@ -479,6 +516,7 @@
                         <button onclick="addSection('lastName')">שם משפחה</button>
                         <button onclick="addSection('letterFromPast')">מכתב מהעבר</button>
                         <button onclick="addSection('familyID')">ת"ז משפחתית</button>
+                        <button onclick="addSection('interview')">ראיון</button>
                         <button onclick="addSection('custom')">מקטע מותאם אישית</button>
                     </div>
                     <div class="content-panel">
@@ -495,8 +533,14 @@
                         <div class="action-buttons">
                             <button class="save-button" onclick="saveWork()">שמור עבודה</button>
                             <button class="action-buttons view-button" onclick="viewWork()">צפה בעבודה</button>
+                            <button onclick="showQrCodePopup()">הדפסת QR</button>
                         </div>
                     </div>
+                </div>
+                <div id="qrCodePopup" class="qr-code-popup">
+                    <img id="qrCodeImage" src="" alt="QR Code"/>
+                    <button onclick="printQrCode()">הדפס QR</button>
+                    <button onclick="hideQrCodePopup()">סגור</button>
                 </div>
             `;
             document.getElementById('pageTitle').textContent = `ניהול עבודת שורשים - ${childId}`;
@@ -538,6 +582,38 @@
             const lastNameHebrew = document.getElementById('childLastNameHebrew').value;
             document.getElementById('childNameHebrewDisplay').textContent = `${firstNameHebrew} ${lastNameHebrew}`.trim();
         }
+
+        // QR Code Popup Functions
+        window.showQrCodePopup = function() {
+            const workUrl = `${window.location.origin}/#/${currentChildId}`;
+            const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(workUrl)}&ecLevel=L&margin=2&size=200&centerImageUrl=https%3A%2F%2Fi.postimg.cc%2FnVNHjMqs%2Fhttpsshop-super-pharm-co-ilcarehair-carehair-filling-Agiva-Volumiz.png`;
+            document.getElementById('qrCodeImage').src = qrCodeUrl;
+            document.getElementById('qrCodePopup').style.display = 'block';
+        };
+
+        window.hideQrCodePopup = function() {
+            document.getElementById('qrCodePopup').style.display = 'none';
+        };
+
+        window.printQrCode = function() {
+            const qrCodeImage = document.getElementById('qrCodeImage');
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>הדפסת QR קוד</title>
+                    <style>
+                        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+                        img { max-width: 300px; max-height: 300px; }
+                    </style>
+                </head>
+                <body>
+                    <img src="${qrCodeImage.src}" alt="QR Code" onload="setTimeout(function() { window.print(); window.close(); }, 500);" />
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        };
 
         // ADD SECTION FUNCTION AS REQUESTED
         window.addSection = function(type, savedData = {}) {
@@ -642,6 +718,21 @@
                         ${createImageUploadField('familyIdPhoto', 'העלאת תמונה', savedData.familyIdPhoto)}
                     `;
                     break;
+                case 'interview':
+                    sectionContent = `
+                        <h3 class="section-title">ראיון</h3>
+                        <div class="section-field"><label>שם:</label>
+                            <input type="text" name="interviewName" value="${savedData.interviewName || ''}">
+                        </div>
+                        <div class="section-field"><label>קשר משפחתי:</label>
+                            <input type="text" name="interviewRelationship" value="${savedData.interviewRelationship || ''}">
+                        </div>
+                        <div class="section-field" style="width:100%;">
+                            <label>טקסט:</label>
+                            <textarea name="interviewText" rows="8" style="width:100%;">${savedData.interviewText || ''}</textarea>
+                        </div>
+                    `;
+                    break;
                 case 'custom':
                     sectionContent = `
                         <h3 class="section-title">מקטע מותאם אישית</h3>
@@ -662,8 +753,7 @@
 
             sectionDiv.innerHTML = `
                 ${sectionContent}
-                <button onclick="removeSection(this)" style="background-color: #dc3545; color: white; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">מחק מקטע</button>
-            `;
+                <button onclick="removeSection(this)" style="background-color: #dc3545; color: white; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">מחק מקטע</button>`;
             sectionsContainer.appendChild(sectionDiv);
         };
 
@@ -791,6 +881,7 @@
             const contentDiv = document.getElementById('app-content');
             contentDiv.className = 'work-container';
             contentDiv.innerHTML = `
+                <img id="workLogo" src="https://i.postimg.cc/nVNHjMqs/httpsshop-super-pharm-co-ilcarehair-carehair-filling-Agiva-Volumiz.png" alt="לוגו עבודת שורשים">
                 <h1 id="mainTitle">טוען עבודת שורשים...</h1>
                 <h2 id="subTitle"></h2>
                 <div id="sectionsContainer"></div>
@@ -872,6 +963,18 @@
                                         </div>
                                     `;
                                     break;
+                                case 'interview':
+                                    contentHtml = `
+                                        <h3>ראיון</h3>
+                                        <div class="section-content">
+                                            <p><strong>שם:</strong> ${section.data.interviewName || 'לא הוזן'}</p>
+                                            <p><strong>קשר משפחתי:</strong> ${section.data.interviewRelationship || 'לא הוזן'}</p>
+                                            <p class="interview-text">
+                                                ${section.data.interviewText || 'לא הוזן'}
+                                            </p>
+                                        </div>
+                                    `;
+                                    break;
                                 case 'custom':
                                     contentHtml = `
                                         <h3>${section.data.customTitle || 'מקטע מותאם אישית'}</h3>
@@ -909,6 +1012,11 @@
     <div id="messageBox" class="message-box">
         <p id="messageText"></p>
         <button id="messageButton">אישור</button>
+    </div>
+    <div id="qrCodePopup" class="qr-code-popup">
+        <img id="qrCodeImage" src="" alt="QR Code"/>
+        <button onclick="printQrCode()">הדפס QR</button>
+        <button onclick="hideQrCodePopup()">סגור</button>
     </div>
 </body>
 </html>
