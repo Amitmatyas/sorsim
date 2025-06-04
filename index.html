@@ -6,6 +6,7 @@
     <title>יצירת עבודת שורשים חדשה</title>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* סגנונות כלליים לגוף העמוד */
         body {
             font-family: 'Heebo', sans-serif;
             display: flex;
@@ -14,8 +15,9 @@
             min-height: 100vh;
             background-color: #f4f4f4;
             margin: 0;
-            direction: rtl;
+            direction: rtl; /* כיווניות מימין לשמאל לעברית */
         }
+        /* סגנונות למיכל הראשי */
         .container {
             background-color: #fff;
             padding: 30px;
@@ -24,26 +26,30 @@
             text-align: center;
             width: 450px;
         }
+        /* סגנונות לכותרת הראשית */
         h1 {
             color: #333;
             margin-bottom: 20px;
         }
+        /* סגנונות לתוויות (labels) */
         label {
             display: block;
             margin-bottom: 10px;
             font-size: 1.1em;
             color: #555;
-            text-align: right;
+            text-align: right; /* יישור לימין */
         }
+        /* סגנונות לשדות קלט טקסט */
         input[type="text"] {
-            width: calc(100% - 20px);
+            width: calc(100% - 20px); /* רוחב מלא פחות ריפוד */
             padding: 10px;
             margin-bottom: 20px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 1em;
-            text-align: right;
+            text-align: right; /* יישור טקסט לימין */
         }
+        /* סגנונות לכפתורים */
         button {
             background-color: #007bff;
             color: white;
@@ -52,24 +58,27 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 1.1em;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease; /* אנימציית מעבר בצבע רקע */
         }
+        /* סגנונות לכפתורים במעבר עכבר */
         button:hover {
             background-color: #0056b3;
         }
+        /* סגנונות לתיבת הודעות מותאמת אישית */
         .message-box {
-            position: fixed;
+            position: fixed; /* מיקום קבוע על המסך */
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%); /* ממורכז למרכז המסך */
             background-color: #fff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
+            z-index: 1000; /* מעל שאר האלמנטים */
             text-align: center;
-            display: none; /* Hidden by default */
+            display: none; /* מוסתר כברירת מחדל */
         }
+        /* סגנונות לכפתור בתיבת ההודעות */
         .message-box button {
             margin-top: 15px;
             background-color: #007bff;
@@ -80,8 +89,9 @@
             cursor: pointer;
         }
     </style>
+    <!-- Firebase SDKs - ייבוא ספריות Firebase -->
     <script type="module">
-        // Your web app's Firebase configuration
+        // הגדרות Firebase של האפליקציה שלך
         const firebaseConfig = {
             apiKey: "AIzaSyDlyDbpwcBcWvFnvYHb84dMEpaQFTjv-HY",
             authDomain: "tester-69fa9.firebaseapp.com",
@@ -92,71 +102,79 @@
             measurementId: "G-BFJ1QQM3MS"
         };
         
+        // ייבוא פונקציות ספציפיות מ-Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Initialize Firebase
+        // אתחול Firebase
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db = getFirestore(app); // קבלת מופע של Firestore
 
-        // Function to show a custom message box instead of alert()
+        // פונקציה להצגת תיבת הודעה מותאמת אישית במקום alert()
         function showMessage(message, callback = null) {
             const messageBox = document.getElementById('messageBox');
             const messageText = document.getElementById('messageText');
             const messageButton = document.getElementById('messageButton');
 
-            messageText.textContent = message;
-            messageBox.style.display = 'block';
+            messageText.textContent = message; // הגדרת טקסט ההודעה
+            messageBox.style.display = 'block'; // הצגת תיבת ההודעה
 
+            // הגדרת פעולה לכפתור האישור
             messageButton.onclick = function() {
-                messageBox.style.display = 'none';
+                messageBox.style.display = 'none'; // הסתרת תיבת ההודעה
                 if (callback) {
-                    callback();
+                    callback(); // הפעלת פונקציית קריאה חוזרת אם קיימת
                 }
             };
         }
 
+        // פונקציה ליצירת עבודת שורשים חדשה
         window.createWork = async function() {
             const childFirstNameEnglish = document.getElementById('childFirstNameEnglish').value.trim();
             const childLastNameEnglish = document.getElementById('childLastNameEnglish').value.trim();
             
+            // בדיקה אם הוזנו שמות
             if (!childFirstNameEnglish || !childLastNameEnglish) {
                 showMessage('אנא הזן גם שם פרטי וגם שם משפחה באנגלית.');
                 return;
             }
 
-            // Combine first and last name for a unique ID, e.g., "Amit-Matyas"
+            // יצירת מזהה ייחודי עבור הילד (לדוגמה: "Amit-Matyas")
             const childId = `${childFirstNameEnglish}-${childLastNameEnglish}`;
 
-            // Basic validation for English letters, numbers, underscore, hyphen
+            // ולידציה בסיסית: רק אותיות באנגלית, מספרים, קו תחתון ומקף
             if (!/^[a-zA-Z0-9_-]+$/.test(childId)) {
                 showMessage('שם הילד באנגלית יכול להכיל אותיות באנגלית, מספרים, קו תחתון ומקף בלבד.');
                 return;
             }
 
             try {
+                // יצירת הפניה למסמך ב-Firestore
                 const docRef = doc(db, "works", childId);
+                // בדיקה אם המסמך כבר קיים
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
-                    // If document already exists, just redirect to its admin page
+                    // אם המסמך קיים, הפנה לעמוד הניהול הקיים
                     showMessage('עבודה עם שם זה כבר קיימת. מועבר לעמוד הניהול הקיים.', function() {
-                        window.location.href = `/${childId}/admin`; // Uses rewrite rule
+                        window.location.href = `/${childId}/admin`; // שימוש בכלל ה-rewrite
                     });
                 } else {
-                    // Create a new document in Firestore with basic structure
+                    // אם המסמך לא קיים, צור מסמך חדש עם מבנה בסיסי
                     await setDoc(docRef, {
                         childFirstNameEnglish: childFirstNameEnglish,
                         childLastNameEnglish: childLastNameEnglish,
-                        childFirstNameHebrew: "", // Will be set in admin page
-                        childLastNameHebrew: "", // Will be set in admin page
-                        sections: [] // Will be populated in admin page
+                        childFirstNameHebrew: "", // יוגדר בעמוד הניהול
+                        childLastNameHebrew: "", // יוגדר בעמוד הניהול
+                        sections: [] // מקטעים יאוכלסו בעמוד הניהול
                     });
+                    // הצגת הודעת הצלחה והפניה לעמוד הניהול
                     showMessage('עבודה נוצרה בהצלחה! מועבר לעמוד הניהול.', function() {
-                        window.location.href = `/${childId}/admin`; // Uses rewrite rule
+                        window.location.href = `/${childId}/admin`; // שימוש בכלל ה-rewrite
                     });
                 }
             } catch (e) {
+                // טיפול בשגיאות
                 console.error("Error creating or accessing document: ", e);
                 showMessage('שגיאה ביצירת העבודה או בגישה אליה. אנא נסה שוב מאוחר יותר.');
             }
@@ -175,6 +193,7 @@
         <button onclick="createWork()">צור עבודה</button>
     </div>
 
+    <!-- תיבת הודעות מותאמת אישית -->
     <div id="messageBox" class="message-box">
         <p id="messageText"></p>
         <button id="messageButton">אישור</button>
