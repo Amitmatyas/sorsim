@@ -998,8 +998,8 @@
                                     contentHtml = `
                                         ${section.data.customTitle ? `<h3>${section.data.customTitle}</h3>` : ''}
                                         <div class="section-content">
-                                            ${section.data.customContent || 'אין תוכן למקטע זה.'}
-                                            ${displayImage(section.data.customSectionPhoto, 'תמונה')}
+                                            ${section.data.customContent || ''}
+                                            ${displayImage(section.data.customSectionPhoto, '')}
                                         </div>
                                     `;
                                     break;
