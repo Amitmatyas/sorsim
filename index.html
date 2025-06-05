@@ -964,8 +964,7 @@
                                             <p><strong>תאריך לידה (עברי):</strong> ${section.data.birthDateHebrew || 'לא הוזן'}</p>
                                             <p><strong>תאריך לידה (לועזי):</strong> ${section.data.birthDateGregorian || 'לא הוזן'}</p>
                                             ${displayImage(section.data.babyPhotoUrl, 'תמונה כתינוק')}
-                                            ${displayImage(section.data.britInvitationUrl, 'הזמנה לברית')}
-                                            ${displayImage(section.data.birthCertificateUrl, 'תעודת לידה')}
+                                            ${section.data.britInvitationUrl ? `<img src="${section.data.britInvitationUrl}" alt="הזמנה לברית" style="max-width: 100%; height: auto;">` : ''}                                            ${displayImage(section.data.birthCertificateUrl, 'תעודת לידה')}
                                             <p><strong>מקום לידה:</strong> ${section.data.birthCountry || 'לא הוזן'}, ${section.data.birthCity || 'לא הוזן'}, ${section.data.birthHospital || 'לא הוזן'}</p>
                                             <p><strong>סיפור סביב השם:</strong></p>
                                             <p>${section.data.firstNameStory || 'לא הוזן'}</p>
