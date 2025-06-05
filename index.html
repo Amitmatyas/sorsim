@@ -680,7 +680,7 @@
 
             const createImageUploadField = (fieldName, labelText, savedUrl) => {
                 const inputId = `${fieldName}-${sectionCounter}`;
-                const placeholderImage = 'https://placehold.co/150x150/e0e0e0/555555?text=אין+תמונה';
+                const placeholderImage = 'https://placehold.co/150x150/e0e0e0/555555?text=אין+';
                 const currentImageUrl = savedUrl || placeholderImage;
                 const displayStyle = savedUrl ? 'block' : 'none';
                 return `
@@ -733,7 +733,6 @@
                         <div class="section-field"><label>כינוי חיבה - למה:</label>
                             <input type="text" name="nicknameWhy" value="${savedData.nicknameWhy || ''}">
                         </div>
-                        ${createImageUploadField('firstNameSectionPhoto', 'העלאת תמונה', savedData.firstNameSectionPhoto)}
                     `;
                     break;
                 case 'lastName':
@@ -751,7 +750,6 @@
                         <div class="section-field"><label>סיפור משפחתי סביב השם:</label>
                             <textarea name="familyStoryAboutName">${savedData.familyStoryAboutName || ''}</textarea>
                         </div>
-                        ${createImageUploadField('lastNameSectionPhoto', 'העלאת תמונה', savedData.lastNameSectionPhoto)}
                     `;
                     break;
 
@@ -762,7 +760,6 @@
                             <label>מכתב:</label>
                             <textarea name="letterContent" rows="8" style="width:100%;">${savedData.letterContent || ''}</textarea>
                         </div>
-                        ${createImageUploadField('letterFromPastPhoto', 'העלאת תמונה', savedData.letterFromPastPhoto)}
                     `;
                     break;
 
@@ -986,7 +983,7 @@
                                             <p><strong>מאיזה שפה זה:</strong> ${section.data.lastNameLanguage || 'לא הוזן'}</p>
                                             <p><strong>סיפור משפחתי סביב השם:</strong></p>
                                             <p>${section.data.familyStoryAboutName || 'לא הוזן'}</p>
-                                            ${displayImage(section.data.lastNameSectionPhoto, 'תמונה')}
+                                            ${displayImage(section.data.lastNameSectionPhoto, '')}
                                         </div>
                                     `;
                                     break;
@@ -995,7 +992,7 @@
                                         <h3>מכתב מהעבר</h3>
                                         <div class="section-content">
                                             <p>${section.data.letterContent || 'לא הוזן'}</p>
-                                            ${displayImage(section.data.letterFromPastPhoto, 'תמונה')}
+                                            ${displayImage(section.data.letterFromPastPhoto, '')}
                                         </div>
                                     `;
                                     break;
@@ -1003,7 +1000,7 @@
                                     contentHtml = `
                                         <h3>ת"ז משפחתית</h3>
                                         <div class="section-content">
-                                            ${displayImage(section.data.familyIdPhoto, 'תמונה')}
+                                            ${displayImage(section.data.familyIdPhoto, '')}
                                         </div>
                                     `;
                                     break;
