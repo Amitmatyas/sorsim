@@ -742,7 +742,7 @@
                     break;
                 case 'interview':
                     sectionContent = `
-                    <h3 class="section-title">ראיון</h3>
+                        <h3 class="section-title">ראיון</h3>
                         <div class="section-field"><label>שם:</label>
                             <input type="text" name="interviewName" value="${savedData.interviewName || ''}">
                         </div>
@@ -759,15 +759,15 @@
                     sectionContent = `
                         <h3 class="section-title">${savedData.customTitle ? savedData.customTitle : ''}</h3>
                         <div class="formatting-buttons">
-                            <button onclick="formatText('bold')">מודגש</button>
-                            <button onclick="formatText('italic')">נטוי</button>
-                            <button onclick="formatText('underline')">קו תחתון</button>
-                            <button onclick="formatText('insertUnorderedList')">רשימה</button>
-                            <button onclick="formatText('insertOrderedList')">נקודות</button>
+                            <button type="button" onclick="formatText('bold', this)">מודגש</button>
+                            <button type="button" onclick="formatText('italic', this)">נטוי</button>
+                            <button type="button" onclick="formatText('underline', this)">קו תחתון</button>
+                            <button type="button" onclick="formatText('insertUnorderedList', this)">רשימה</button>
+                            <button type="button" onclick="formatText('insertOrderedList', this)">נקודות</button>
                         </div>
                         <div class="section-field" style="width:100%;">
                             <label>תוכן:</label>
-                            <textarea id="customContent-${sectionCounter}" name="customContent" rows="4" style="width:100%;">${savedData.customContent || ''}</textarea>
+                            <textarea name="customContent" rows="4" style="width:100%;"></textarea>
                         </div>
                         ${createImageUploadField('customSectionPhoto', 'העלאת תמונה', savedData.customSectionPhoto)}
                     `;
@@ -846,15 +846,14 @@
         // Handle paste event for interview section
         window.handlePaste = function(event) {
             event.preventDefault();
-            let paste = (event.clipboardData || window.clipboardData).getData('text');
-            paste = paste.replace(/\n/g, "<br>");
-            document.execCommand("insertHTML", false, paste);
+            const text = event.clipboardData.getData('text/html') || event.clipboardData.getData('text/plain');
+            document.execCommand('insertHTML', false, text);
         };
 
         // Format text in custom section
-        window.formatText = function(command) {
-            const sectionId = event.target.closest('.section-block').id;
-            const textarea = document.querySelector(`#${sectionId} textarea[name="customContent"]`);
+        window.formatText = function(command, button) {
+            const sectionDiv = button.closest('.section-block');
+            const textarea = sectionDiv.querySelector('textarea[name="customContent"]');
             textarea.focus();
             document.execCommand(command, false, null);
         };
@@ -1027,7 +1026,7 @@
                                         ${section.data.customTitle ? `<h3>${section.data.customTitle}</h3>` : ''}
                                         <div class="section-content">
                                             ${section.data.customContent || ''}
-                                            ${displayImage(section.data.customSectionPhoto, '')}
+                                            ${section.data.customSectionPhoto ? displayImage(section.data.customSectionPhoto, '') : ''}
                                         </div>
                                     `;
                                     break;
