@@ -921,25 +921,47 @@
                 <h2 id="subTitle"></h2>
                 <div id="sectionsContainer"></div>
             `;
-            document.getElementById('pageTitle').textContent = `עבודת שורשים - ${childId}`;
-            try {
-                const docRef = doc(db, "works", childId);
-                const docSnap = await getDoc(docRef);
+currentChildId = childId;
+document.getElementById('pageTitle').textContent = 'ניהול עבודת שורשים';
 
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    document.getElementById('mainTitle').textContent = `עבודת שורשים`;
-                    document.getElementById('subTitle').textContent = `${data.childFirstNameHebrew || ''} ${data.childLastNameHebrew || ''}`.trim();
+try {
+    const docRef = doc(db, "works", childId);
+    const docSnap = await getDoc(docRef);
 
-                    const sectionsContainer = document.getElementById('sectionsContainer');
-                    sectionsContainer.innerHTML = '';
+    if (docSnap.exists()) {
+        const data = docSnap.data();
+        const hebrewName = `${data.childFirstNameHebrew || ''} ${data.childLastNameHebrew || ''}`.trim();
+        
+        // עדכון כל הכותרות והתצוגות בדף
+        document.getElementById('pageTitle').textContent = hebrewName ? 
+            `ניהול עבודת שורשים - ${hebrewName}` : 
+            `ניהול עבודת שורשים - ${childId}`;
+            
+        document.getElementById('childFirstNameHebrew').value = data.childFirstNameHebrew || '';
+        document.getElementById('childLastNameHebrew').value = data.childLastNameHebrew || '';
+        document.getElementById('childNameHebrewDisplay').textContent = hebrewName || childId;
 
-                    if (data.sections && Array.isArray(data.sections)) {
-                        data.sections.forEach(section => {
-                            const sectionDiv = document.createElement('div');
-                            sectionDiv.className = 'section-display';
-                            let contentHtml = '';
+        // איפוס וטעינת המקטעים
+        const sectionsContainer = document.getElementById('sectionsContainer');
+        sectionsContainer.innerHTML = '';
+        sectionCounter = 0;
 
+        if (data.sections && Array.isArray(data.sections)) {
+            data.sections.forEach(sectionData => {
+                addSection(sectionData.type, sectionData.data);
+            });
+        }
+    } else {
+        showMessage(`שגיאה: עבודה עם מזהה "${childId}" לא נמצאה. ייתכן שהיא נמחקה או שהכתובת שגויה.`, function() {
+            window.location.href = '/404.html';
+        });
+    }
+} catch (e) {
+    console.error("Error loading document: ", e);
+    showMessage('שגיאה בטעינת העבודה. אנא נסה שוב מאוחר יותר.', function() {
+        navigateHash('/');
+    });
+}
                             const displayImage = (url, altText) => {
                                 if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
                                     return `
@@ -1045,11 +1067,35 @@
             }
         }
 
-        window.updateChildNameDisplay = function() {
-            const firstNameHebrew = document.getElementById('childFirstNameHebrew').value;
-            const lastNameHebrew = document.getElementById('childLastNameHebrew').value;
-            document.getElementById('childNameHebrewDisplay').textContent = `${firstNameHebrew} ${lastNameHebrew}`.trim();
-        };
+window.updateChildNameDisplay = async function() {
+    const firstNameHebrew = document.getElementById('childFirstNameHebrew').value;
+    const lastNameHebrew = document.getElementById('childLastNameHebrew').value;
+    const hebrewName = `${firstNameHebrew} ${lastNameHebrew}`.trim();
+    
+    // עדכון שם בתצוגה
+    document.getElementById('childNameHebrewDisplay').textContent = hebrewName;
+    
+    // עדכון כותרת הדף
+    if (hebrewName) {
+        document.getElementById('pageTitle').textContent = `ניהול עבודת שורשים - ${hebrewName}`;
+    } else if (currentChildId) {
+        // אם אין שם בעברית, מנסה לקבל אותו מ-Firebase
+        try {
+            const docRef = doc(db, "works", currentChildId);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                const savedHebrewName = `${data.childFirstNameHebrew || ''} ${data.childLastNameHebrew || ''}`.trim();
+                document.getElementById('pageTitle').textContent = savedHebrewName ? 
+                    `ניהול עבודת שורשים - ${savedHebrewName}` : 
+                    `ניהול עבודת שורשים - ${currentChildId}`;
+            }
+        } catch (error) {
+            console.error("Error getting document:", error);
+            document.getElementById('pageTitle').textContent = `ניהול עבודת שורשים - ${currentChildId}`;
+        }
+    }
+};
 
         // Image upload handling
         window.handleImageUpload = async function(event, fieldName, sectionDivId) {
