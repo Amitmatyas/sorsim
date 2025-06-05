@@ -378,6 +378,19 @@
             color: #555;
             margin-top: 5px;
         }
+        .formatting-buttons {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+        .formatting-buttons button {
+            padding: 5px 10px;
+            font-size: 0.9em;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f9f9f9;
+        }
     </style>
     <!-- Firebase SDKs -->
     <script type="module">
@@ -729,7 +742,7 @@
                     break;
                 case 'interview':
                     sectionContent = `
-                        <h3 class="section-title">ראיון</h3>
+                    <h3 class="section-title">ראיון</h3>
                         <div class="section-field"><label>שם:</label>
                             <input type="text" name="interviewName" value="${savedData.interviewName || ''}">
                         </div>
@@ -745,23 +758,16 @@
                 case 'custom':
                     sectionContent = `
                         <h3 class="section-title">${savedData.customTitle ? savedData.customTitle : ''}</h3>
+                        <div class="formatting-buttons">
+                            <button onclick="formatText('bold')">מודגש</button>
+                            <button onclick="formatText('italic')">נטוי</button>
+                            <button onclick="formatText('underline')">קו תחתון</button>
+                            <button onclick="formatText('insertUnorderedList')">רשימה</button>
+                            <button onclick="formatText('insertOrderedList')">נקודות</button>
+                        </div>
                         <div class="section-field" style="width:100%;">
-                            <label>תוכן (השתמש בפורמט HTML בסיסי):</label>
-                            <textarea name="customContent" rows="4" style="width:100%;">${savedData.customContent || ''}</textarea>
-                            <p><b>הוראות בסיסיות לשימוש:</b></p>
-                            <p><b>מודגש:</b> &lt;b&gt;טקסט מודגש&lt;/b&gt;</p>
-                            <p><i>נטוי:</i> &lt;i&gt;טקסט נטוי&lt;/i&gt;</p>
-                            <p><u>קו תחתון:</u> &lt;u&gt;טקסט עם קו תחתון&lt;/u&gt;</p>
-                            <p>רשימה:</p>
-                            <p>&lt;ul&gt;</p>
-                            <p>&lt;li&gt;פריט 1&lt;/li&gt;</p>
-                            <p>&lt;li&gt;פריט 2&lt;/li&gt;</p>
-                            <p>&lt;/ul&gt;</p>
-                            <p>נקודות:</p>
-                            <p>&lt;ol&gt;</p>
-                            <p>&lt;li&gt;נקודה 1&lt;/li&gt;</p>
-                            <p>&lt;li&gt;נקודה 2&lt;/li&gt;</p>
-                            <p>&lt;/ol&gt;</p>
+                            <label>תוכן:</label>
+                            <textarea id="customContent-${sectionCounter}" name="customContent" rows="4" style="width:100%;">${savedData.customContent || ''}</textarea>
                         </div>
                         ${createImageUploadField('customSectionPhoto', 'העלאת תמונה', savedData.customSectionPhoto)}
                     `;
@@ -801,7 +807,7 @@
                     body: formData
                 });
 
-                const data = await response.json();
+            const data = await response.json();
 
                 if (response.ok && data.secure_url) {
                     event.target.setAttribute('data-image-url', data.secure_url);
@@ -840,8 +846,17 @@
         // Handle paste event for interview section
         window.handlePaste = function(event) {
             event.preventDefault();
-            const text = event.clipboardData.getData('text/html') || event.clipboardData.getData('text/plain');
-            document.execCommand('insertHTML', false, text);
+            let paste = (event.clipboardData || window.clipboardData).getData('text');
+            paste = paste.replace(/\n/g, "<br>");
+            document.execCommand("insertHTML", false, paste);
+        };
+
+        // Format text in custom section
+        window.formatText = function(command) {
+            const sectionId = event.target.closest('.section-block').id;
+            const textarea = document.querySelector(`#${sectionId} textarea[name="customContent"]`);
+            textarea.focus();
+            document.execCommand(command, false, null);
         };
 
         // Save work
