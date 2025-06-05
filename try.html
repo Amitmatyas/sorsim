@@ -633,8 +633,7 @@
                     <button onclick="hideQrCodePopup()">סגור</button>
                 </div>
             `;
-            document.getElementById('pageTitle').textContent = `ניהול עבודת שורשים - ${childid}`;
-
+            document.getElementById('pageTitle').textContent = `ניהול עבודת שורשים - ${childId}`;
             try {
                 const docRef = doc(db, "works", childId);
                 const docSnap = await getDoc(docRef);
@@ -922,8 +921,7 @@
                 <h2 id="subTitle"></h2>
                 <div id="sectionsContainer"></div>
             `;
-            document.getElementById('pageTitle').textContent = `עבודת שורשים - ${childid}`;
-
+            document.getElementById('pageTitle').textContent = `עבודת שורשים - ${childId}`;
             try {
                 const docRef = doc(db, "works", childId);
                 const docSnap = await getDoc(docRef);
