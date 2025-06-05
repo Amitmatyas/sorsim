@@ -733,7 +733,6 @@
                         <div class="section-field"><label>כינוי חיבה - למה:</label>
                             <input type="text" name="nicknameWhy" value="${savedData.nicknameWhy || ''}">
                         </div>
-                        ${createImageUploadField('firstNameSectionPhoto', 'העלאת תמונה', savedData.firstNameSectionPhoto)}
                     `;
                     break;
                 case 'lastName':
@@ -751,7 +750,6 @@
                         <div class="section-field"><label>סיפור משפחתי סביב השם:</label>
                             <textarea name="familyStoryAboutName">${savedData.familyStoryAboutName || ''}</textarea>
                         </div>
-                        ${createImageUploadField('lastNameSectionPhoto', 'העלאת תמונה', savedData.lastNameSectionPhoto)}
                     `;
                     break;
 
@@ -762,7 +760,6 @@
                             <label>מכתב:</label>
                             <textarea name="letterContent" rows="8" style="width:100%;">${savedData.letterContent || ''}</textarea>
                         </div>
-                        ${createImageUploadField('letterFromPastPhoto', 'העלאת תמונה', savedData.letterFromPastPhoto)}
                     `;
                     break;
 
