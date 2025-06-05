@@ -35,10 +35,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            /* Animated gradient for a vibrant feel */
-            background: linear-gradient(45deg, #e0f2fe, #eef2ff, #f3e8ff, #ede9fe);
-            background-size: 400% 400%; /* Larger background for animation */
-            animation: gradientBackground 15s ease infinite; /* Smooth, infinite animation */
+            /* Animated gradient for a vibrant feel - faster and larger */
+            background: linear-gradient(45deg, #e0f2fe, #eef2ff, #f3e8ff, #ede9fe, #dff0f6, #e7eefd);
+            background-size: 600% 600%; /* Larger background for more noticeable movement */
+            animation: gradientBackground 10s ease infinite; /* Faster, smooth, infinite animation */
             z-index: 1; /* Behind content */
         }
 
@@ -75,9 +75,9 @@
             }
         }
 
-        /* Title specific animations */
+        /* Title specific animations - pulsing glow and subtle bounce */
         h1 {
-            animation: textGlow 1.5s infinite alternate; /* Pulsing glow for the title */
+            animation: textGlow 1.5s infinite alternate, textShake 0.5s infinite alternate; /* Added textShake */
             text-shadow: 0 0 5px rgba(99, 102, 241, 0.5), 0 0 10px rgba(99, 102, 241, 0.3);
         }
 
@@ -92,23 +92,31 @@
             }
         }
 
+        @keyframes textShake {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(-1px) translateY(-1px); }
+            75% { transform: translateX(1px) translateY(1px); }
+        }
 
-        /* Styling for input fields */
+
+        /* Styling for input fields and select */
         .input-field {
             border: 1px solid #cbd5e1; /* Light grey border */
             border-radius: 10px; /* Rounded input fields */
             padding: 12px 16px;
             font-size: 1rem;
             color: #333;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease; /* Smooth transitions on focus */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease, background-color 0.3s ease; /* Added background-color */
             text-align: left; /* Ensure text within inputs is LTR */
+            background-color: #f8fafc; /* Light background for inputs */
         }
 
         .input-field:focus {
             outline: none;
             border-color: #6366f1; /* Indigo focus border */
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.4), 0 0 15px rgba(99, 102, 241, 0.2); /* Stronger glow on focus */
-            transform: translateY(-2px); /* Slight lift on focus */
+            box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.4), 0 0 20px rgba(99, 102, 241, 0.3); /* Stronger glow on focus */
+            transform: translateY(-3px) scale(1.005); /* More pronounced lift on focus */
+            background-color: #ffffff; /* White background on focus */
         }
 
         /* Styling for labels */
@@ -130,20 +138,22 @@
             box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3), 0 4px 6px rgba(99, 102, 241, 0.1);
             position: relative; /* For ripple effect */
             overflow: hidden; /* For ripple effect */
+            animation: pulseEffect 2s infinite ease-in-out; /* Continuous pulsing effect */
         }
 
         .btn-primary:hover:not(:disabled) {
-            transform: translateY(-3px); /* Subtle lift effect on hover */
+            transform: translateY(-5px); /* More dramatic lift effect on hover */
             /* More intense shadow on hover */
-            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4), 0 6px 10px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.6), 0 8px 12px rgba(99, 102, 241, 0.3);
             /* Slightly different gradient on hover for visual feedback */
             background: linear-gradient(135deg, #7c3aed, #a78bfa);
         }
 
         .btn-primary:active:not(:disabled) {
-            transform: translateY(1px) scale(0.98); /* Press down effect on click */
+            transform: translateY(2px) scale(0.95); /* More pronounced press down effect on click */
             box-shadow: 0 5px 10px rgba(99, 102, 241, 0.2);
             transition: transform 0.1s ease-out; /* Quick transition for click */
+            animation: none; /* Stop pulsing during active state */
         }
 
         .btn-primary:disabled {
@@ -151,14 +161,15 @@
             cursor: not-allowed;
             box-shadow: none;
             transform: none;
+            animation: none; /* Stop pulsing when disabled */
         }
 
         /* Ripple effect for button click */
         .btn-primary .ripple {
             position: absolute;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.7); /* White ripple */
-            animation: ripple-animation 0.6s linear forwards;
+            background: rgba(255, 255, 255, 0.8); /* White ripple, slightly more opaque */
+            animation: ripple-animation 0.7s linear forwards; /* Slightly longer ripple */
             transform: scale(0);
             pointer-events: none;
             opacity: 0;
@@ -175,6 +186,39 @@
             }
         }
 
+        /* Continuous pulsing effect for the primary button */
+        @keyframes pulseEffect {
+            0% { transform: scale(1); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3), 0 4px 6px rgba(99, 102, 241, 0.1); }
+            50% { transform: scale(1.015); box-shadow: 0 15px 30px rgba(99, 102, 241, 0.5), 0 6px 10px rgba(99, 102, 241, 0.2); }
+            100% { transform: scale(1); box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3), 0 4px 6px rgba(99, 102, 241, 0.1); }
+        }
+
+        /* Styling for the secondary button (Load Documents) */
+        .btn-secondary {
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd); /* Light purple gradient */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 10px rgba(167, 139, 250, 0.3);
+            display: flex; /* For alignment with input field */
+            align-items: center; /* Center text vertically */
+            justify-content: center; /* Center text horizontally */
+        }
+        .btn-secondary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(167, 139, 250, 0.4);
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        }
+        .btn-secondary:disabled {
+            background: #d8c9ff;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
 
         /* Styling for message display boxes */
         .message-box {
@@ -184,18 +228,19 @@
             font-weight: 600;
             text-align: center;
             margin-top: 25px;
-            animation: slideInUpPulse 0.8s ease-out forwards; /* Message entry animation with pulse */
+            animation: slideInUpBounce 0.8s ease-out forwards; /* Message entry animation with pronounced bounce */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for message box */
         }
 
-        /* Animation for message boxes - combines slide in with a subtle pulse */
-        @keyframes slideInUpPulse {
+        /* Animation for message boxes - combines slide in with a pronounced bounce */
+        @keyframes slideInUpBounce {
             0% {
                 opacity: 0;
-                transform: translateY(30px) scale(0.95);
+                transform: translateY(50px) scale(0.9);
             }
             70% {
                 opacity: 1;
-                transform: translateY(0) scale(1.02); /* Slight overshoot */
+                transform: translateY(-5px) scale(1.05); /* Larger overshoot for bounce */
             }
             100% {
                 opacity: 1;
@@ -216,7 +261,7 @@
         }
 
         /* Responsive adjustments for smaller screens */
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
             .container {
                 padding: 25px;
                 border-radius: 15px;
@@ -231,6 +276,15 @@
             h1 {
                 font-size: 2rem; /* Adjust title size for smaller screens */
             }
+            .flex-col-md {
+                flex-direction: column; /* Stack elements on smaller screens */
+            }
+            .md\:w-auto {
+                width: 100%; /* Make button full width on small screens */
+            }
+            .md\:mt-0 {
+                margin-top: 1rem; /* Add some margin when stacked */
+            }
         }
     </style>
 </head>
@@ -244,28 +298,37 @@
             משתמש מחובר (ID): <span id="userIdDisplay" class="font-semibold text-blue-700 break-all text-xs">טוען...</span>
         </p>
 
-        <div class="mb-5">
-            <label for="collectionName" class="block text-gray-700 text-sm font-bold mb-2">
-                שם האוסף (Collection Name):
-            </label>
-            <input
-                type="text"
-                id="collectionName"
-                class="input-field w-full"
-                placeholder="לדוגמה: users"
-            />
+        <div class="mb-5 flex flex-col md:flex-row gap-4">
+            <div class="flex-grow">
+                <label for="collectionName" class="block text-gray-700 text-sm font-bold mb-2">
+                    שם האוסף (Collection Name):
+                </label>
+                <input
+                    type="text"
+                    id="collectionName"
+                    class="input-field w-full"
+                    placeholder="לדוגמה: users"
+                />
+            </div>
+            <button
+                id="loadDocumentsButton"
+                class="btn-secondary mt-auto py-2 px-4 rounded-lg font-bold text-sm h-12 flex-shrink-0 md:mt-0"
+            >
+                טען מסמכים
+            </button>
         </div>
 
         <div class="mb-5">
             <label for="oldDocId" class="block text-gray-700 text-sm font-bold mb-2">
                 ID של המסמך הישן:
             </label>
-            <input
-                type="text"
+            <select
                 id="oldDocId"
                 class="input-field w-full"
-                placeholder="לדוגמה: user123"
-            />
+                disabled
+            >
+                <option value="">אנא טען מסמכים ראשית...</option>
+            </select>
         </div>
 
         <div class="mb-8">
@@ -300,7 +363,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Your web app's Firebase configuration - provided by the user
         const firebaseConfig = {
@@ -324,9 +387,10 @@
 
         // Get references to HTML elements
         const collectionNameInput = document.getElementById('collectionName');
-        const oldDocIdInput = document.getElementById('oldDocId');
+        const oldDocIdSelect = document.getElementById('oldDocId'); // Now a select element
         const newDocIdInput = document.getElementById('newDocId');
         const renameButton = document.getElementById('renameButton');
+        const loadDocumentsButton = document.getElementById('loadDocumentsButton');
         const messageDisplay = document.getElementById('messageDisplay');
         const userIdDisplay = document.getElementById('userIdDisplay');
 
@@ -367,11 +431,12 @@
                 userIdDisplay.textContent = currentUserId; // Display user ID in the UI
                 showMessage('Firebase אוסף ומתחבר בהצלחה.', false); // Success message
                 isFirebaseReady = true; // Mark Firebase as ready
-                renameButton.disabled = false; // Enable button once Firebase is ready
+                renameButton.disabled = false; // Enable rename button once Firebase is ready
             } catch (error) {
                 console.error("שגיאה באתחול Firebase או בהתחברות:", error);
-                showMessage(`שגיאה באתחול/התחברות ל-Firebase: ${error.message}`, true); // Error message
+                showMessage(`שגיאה באתחול/התחברות ל-Firebase: ${error.message}. וודא שאימות אנונימי מופעל בפרויקט Firebase שלך.`, true); // Error message
                 renameButton.disabled = true; // Keep button disabled on error
+                loadDocumentsButton.disabled = true; // Disable load documents button on error
             }
         }
 
@@ -398,6 +463,56 @@
         }
 
         /**
+         * Loads document IDs from the specified collection into the dropdown.
+         */
+        async function loadDocuments() {
+            if (!isFirebaseReady || !db || !currentUserId) {
+                showMessage('שגיאה: Firebase אינו מאותחל או שאין משתמש.', true);
+                return;
+            }
+            const collectionName = collectionNameInput.value.trim();
+            if (!collectionName) {
+                showMessage('אנא הזן שם אוסף כדי לטעון מסמכים.', true);
+                return;
+            }
+
+            oldDocIdSelect.innerHTML = '<option value="">טוען מסמכים...</option>'; // Loading state
+            oldDocIdSelect.disabled = true;
+            loadDocumentsButton.disabled = true;
+            renameButton.disabled = true; // Disable rename button while loading
+            showMessage('טוען מסמכים מהאוסף...');
+
+            try {
+                // Construct the collection reference based on the app's security rules.
+                const collectionRef = collection(db, `artifacts/${appId}/users/${currentUserId}/${collectionName}`);
+                const querySnapshot = await getDocs(collectionRef); // Fetch all documents in the collection
+
+                if (querySnapshot.empty) {
+                    oldDocIdSelect.innerHTML = '<option value="">אין מסמכים באוסף זה</option>';
+                    showMessage(`אין מסמכים באוסף '${collectionName}'.`, true);
+                } else {
+                    oldDocIdSelect.innerHTML = '<option value="">בחר מסמך...</option>'; // Reset dropdown
+                    querySnapshot.forEach(doc => {
+                        const option = document.createElement('option');
+                        option.value = doc.id;
+                        option.textContent = doc.id;
+                        oldDocIdSelect.appendChild(option);
+                    });
+                    showMessage(`נמצאו ${querySnapshot.docs.length} מסמכים באוסף '${collectionName}'.`, false);
+                }
+                oldDocIdSelect.disabled = false; // Enable dropdown
+            } catch (error) {
+                console.error("שגיאה בטעינת מסמכים:", error);
+                showMessage(`שגיאה בטעינת מסמכים: ${error.message}. וודא ששם האוסף נכון ושיש לך הרשאות קריאה.`, true);
+                oldDocIdSelect.innerHTML = '<option value="">שגיאה בטעינה</option>';
+            } finally {
+                loadDocumentsButton.disabled = false; // Re-enable load documents button
+                renameButton.disabled = false; // Re-enable rename button
+            }
+        }
+
+
+        /**
          * Handles the document renaming process.
          * Reads the old document, creates a new one with the new ID, and then deletes the old one.
          */
@@ -407,23 +522,22 @@
                 showMessage('שגיאה: Firebase אינו מאותחל או שאין משתמש.', true);
                 return;
             }
-            // Validate input fields
-            if (!collectionNameInput.value || !oldDocIdInput.value || !newDocIdInput.value) {
-                showMessage('אנא מלא את כל השדות: שם אוסף, ID ישן ו-ID חדש.', true);
+            const collectionName = collectionNameInput.value.trim();
+            const oldDocId = oldDocIdSelect.value; // Get selected value from dropdown
+            const newDocId = newDocIdInput.value.trim();
+
+            // Validate input fields and selected document
+            if (!collectionName || !oldDocId || !newDocId || oldDocId === '' || newDocId === '') {
+                showMessage('אנא מלא את כל השדות: שם אוסף, בחר ID קיים ו-ID חדש.', true);
                 return;
             }
 
             renameButton.disabled = true; // Disable button during operation
+            loadDocumentsButton.disabled = true; // Disable load documents button during rename
             showMessage('מבצע שינוי...'); // Show loading message
 
             try {
-                const collectionName = collectionNameInput.value;
-                const oldDocId = oldDocIdInput.value;
-                const newDocId = newDocIdInput.value;
-
                 // Construct the document references based on the app's security rules.
-                // This example uses a private user-specific path: `/artifacts/{appId}/users/{userId}/{collectionName}/{docId}`.
-                // For public data shared across users, you would use: `/artifacts/{appId}/public/data/{collectionName}/{docId}`.
                 const oldDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/${collectionName}`, oldDocId);
                 const newDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/${collectionName}`, newDocId);
 
@@ -446,18 +560,24 @@
 
                 // Success message
                 showMessage(`המסמך '${oldDocId}' שונה בהצלחה ל- '${newDocId}' באוסף '${collectionName}'.`, false);
+
+                // After successful rename, reload documents to reflect the change
+                loadDocuments();
+
             } catch (error) {
                 // Log and display any errors during the process
                 console.error("שגיאה בשינוי שם המסמך:", error);
                 showMessage(`שגיאה בשינוי שם המסמך: ${error.message}`, true);
             } finally {
-                renameButton.disabled = false; // Re-enable the button regardless of success or failure
+                renameButton.disabled = false; // Re-enable the rename button
+                loadDocumentsButton.disabled = false; // Re-enable load documents button
             }
         }
 
         // Add event listeners when the DOM content is fully loaded
         document.addEventListener('DOMContentLoaded', () => {
             initializeFirebase(); // Initialize Firebase when the page loads
+            loadDocumentsButton.addEventListener('click', loadDocuments); // Attach click event to load documents button
             renameButton.addEventListener('click', (e) => {
                 createRipple(e); // Create ripple effect on click
                 handleRenameDocument(); // Then handle the document rename
