@@ -591,7 +591,7 @@
                 showMessage('שגיאה ביצירת העבודה או בגישה אליה. אנא נסה שוב מאוחר יותר.');
             }
         };
-                // Admin View
+        // Admin View
         async function renderAdminView(childId) {
             const contentDiv = document.getElementById('app-content');
             contentDiv.className = 'admin-container';
@@ -634,6 +634,7 @@
                 </div>
             `;
             document.getElementById('pageTitle').textContent = `ניהול עבודת שורשים - ${childId}`;
+
             try {
                 const docRef = doc(db, "works", childId);
                 const docSnap = await getDoc(docRef);
@@ -732,6 +733,7 @@
                         <div class="section-field"><label>כינוי חיבה - למה:</label>
                             <input type="text" name="nicknameWhy" value="${savedData.nicknameWhy || ''}">
                         </div>
+                        ${createImageUploadField('firstNameSectionPhoto', 'העלאת תמונה', savedData.firstNameSectionPhoto)}
                     `;
                     break;
                 case 'lastName':
@@ -749,6 +751,7 @@
                         <div class="section-field"><label>סיפור משפחתי סביב השם:</label>
                             <textarea name="familyStoryAboutName">${savedData.familyStoryAboutName || ''}</textarea>
                         </div>
+                        ${createImageUploadField('lastNameSectionPhoto', 'העלאת תמונה', savedData.lastNameSectionPhoto)}
                     `;
                     break;
 
@@ -759,6 +762,7 @@
                             <label>מכתב:</label>
                             <textarea name="letterContent" rows="8" style="width:100%;">${savedData.letterContent || ''}</textarea>
                         </div>
+                        ${createImageUploadField('letterFromPastPhoto', 'העלאת תמונה', savedData.letterFromPastPhoto)}
                     `;
                     break;
 
@@ -903,280 +907,225 @@
             }
         };
 
-// --- Global Variables and Utility Functions (assuming these are defined elsewhere or will be) ---
-// Example:
-// let currentChildId = null;
-// const db = firebase.firestore(); // Assuming Firebase is initialized
-// const showMessage = (msg, callback) => { /* implementation */ };
-// const navigateHash = (hash) => { /* implementation */ };
-// const CLOUDINARY_CLOUD_NAME = 'your_cloud_name'; // Replace with your Cloudinary name
-// const CLOUDINARY_UPLOAD_PRESET = 'your_upload_preset'; // Replace with your Cloudinary upload preset
-
-
-// --- View Work Function ---
-window.viewWork = function() {
-    if (currentChildId) {
-        window.open(`/#/${currentChildId}`, '_blank');
-    } else {
-        showMessage('אין עבודה לצפייה. אנא צור או טען עבודה קודם.');
-    }
-};
-
-// --- Display Image Helper Function ---
-const displayImage = (url, altText) => {
-    if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
-        return `
-            <div class="image-with-title">
-                <img src="${url}" alt="${altText}" style="max-width: 100%; max-height: 300px; object-fit: contain;">
-                <div class="image-title">${altText}</div>
-            </div>
-        `;
-    }
-    return '';
-};
-
-// --- Add Section Helper Function (used by renderDisplayView) ---
-const addSection = (type, sectionData) => {
-    const sectionsContainer = document.getElementById('sectionsContainer'); // Get container inside this scope for safety
-    const sectionDiv = document.createElement('div');
-    sectionDiv.className = 'section-block'; // Apply a class for styling
-    let contentHtml = '';
-
-    switch (type) {
-        case 'firstName':
-            contentHtml = `
-                <h3>שם פרטי</h3>
-                <div class="section-content">
-                    <p><strong>מקור:</strong> ${sectionData.firstNameOrigin || 'לא הוזן'}</p>
-                    <p><strong>משמעות:</strong> ${sectionData.firstNameMeaning || 'לא הוזן'}</p>
-                    <p><strong>תאריך לידה (עברי):</strong> ${sectionData.birthDateHebrew || 'לא הוזן'}</p>
-                    <p><strong>תאריך לידה (לועזי):</strong> ${sectionData.birthDateGregorian || 'לא הוזן'}</p>
-                    ${displayImage(sectionData.babyPhotoUrl, 'תמונה כתינוק')}
-                    ${displayImage(sectionData.britInvitationUrl, 'הזמנה לברית')}
-                    ${displayImage(sectionData.birthCertificateUrl, 'תעודת לידה')}
-                    <p><strong>מקום לידה:</strong> ${sectionData.birthCountry || 'לא הוזן'}, ${sectionData.birthCity || 'לא הוזן'}, ${sectionData.birthHospital || 'לא הוזן'}</p>
-                    <p><strong>סיפור סביב השם:</strong></p>
-                    <p>${sectionData.firstNameStory || 'לא הוזן'}</p>
-                    <p><strong>כינוי חיבה:</strong> ${sectionData.nicknameWho || 'לא הוזן'} ${sectionData.nicknameWhy ? `כי ${sectionData.nicknameWhy}` : ''}</p>
-                    ${displayImage(sectionData.firstNameSectionPhoto, 'תמונה נוספת')}
-                </div>
-            `;
-            break;
-        case 'lastName':
-            contentHtml = `
-                <h3>שם משפחה</h3>
-                <div class="section-content">
-                    <p><strong>מקור:</strong> ${sectionData.lastNameOrigin || 'לא הוזן'}</p>
-                    <p><strong>משמעות:</strong> ${sectionData.lastNameMeaning || 'לא הוזן'}</p>
-                    <p><strong>מאיזה שפה זה:</strong> ${sectionData.lastNameLanguage || 'לא הוזן'}</p>
-                    <p><strong>סיפור משפחתי סביב השם:</strong></p>
-                    <p>${sectionData.familyStoryAboutName || 'לא הוזן'}</p>
-                    ${displayImage(sectionData.lastNameSectionPhoto, 'תמונה')}
-                </div>
-            `;
-            break;
-        case 'letterFromPast':
-            contentHtml = `
-                <h3>מכתב מהעבר</h3>
-                <div class="section-content">
-                    <p>${sectionData.letterContent || 'לא הוזן'}</p>
-                    ${displayImage(sectionData.letterFromPastPhoto, 'תמונה')}
-                </div>
-            `;
-            break;
-        case 'familyID':
-            contentHtml = `
-                <h3>ת"ז משפחתית</h3>
-                <div class="section-content">
-                    ${displayImage(sectionData.familyIdPhoto, 'תמונה')}
-                </div>
-            `;
-            break;
-        case 'interview':
-            contentHtml = `
-                <h3>ראיון</h3>
-                <div class="section-content">
-                    <p><strong>שם:</strong> ${sectionData.interviewName || 'לא הוזן'}</p>
-                    <p><strong>קשר משפחתי:</strong> ${sectionData.interviewRelationship || 'לא הוזן'}</p>
-                    <p class="interview-text">
-                        ${sectionData.interviewText || 'לא הוזן'}
-                    </p>
-                </div>
-            `;
-            break;
-        case 'custom':
-            contentHtml = `
-                ${sectionData.customTitle ? `<h3>${sectionData.customTitle}</h3>` : ''}
-                <div class="section-content">
-                    ${sectionData.customContent || ''}
-                    ${sectionData.customSectionPhoto ? displayImage(sectionData.customSectionPhoto, '') : ''}
-                </div>
-            `;
-            break;
-        default:
-            contentHtml = `<p>סוג מקטע לא ידוע.</p>`;
-    }
-    sectionDiv.innerHTML = contentHtml;
-    sectionsContainer.appendChild(sectionDiv);
-};
-
-// --- Main Display View Function ---
-async function renderDisplayView(childId) {
-    const contentDiv = document.getElementById('app-content');
-    contentDiv.className = 'work-container';
-    contentDiv.innerHTML = `
-        <img id="workLogo" src="https://i.postimg.cc/nVNHjMqs/httpsshop-super-pharm-co-ilcarehair-carehair-filling-Agiva-Volumiz.png" alt="לוגו עבודת שורשים">
-        <h1 id="mainTitle">Powered By Amit Matyas</h1>
-        <h2 id="subTitle"></h2>
-        <div id="sectionsContainer"></div>
-    `;
-
-    currentChildId = childId;
-    document.getElementById('pageTitle').textContent = 'ניהול עבודת שורשים';
-
-    try {
-        const docRef = doc(db, "works", childId); // Assuming 'db' is defined (e.g., from Firebase initialization)
-        const docSnap = await getDoc(docRef); // Assuming 'getDoc' is defined (e.g., from Firebase firestore)
-
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            const hebrewName = `${data.childFirstNameHebrew || ''} ${data.childLastNameHebrew || ''}`.trim();
-
-            // Update all titles and displays on the page
-            document.getElementById('pageTitle').textContent = hebrewName ?
-                `ניהול עבודת שורשים - ${hebrewName}` :
-                `ניהול עבודת שורשים - ${childId}`;
-
-            // Assuming these elements exist in your HTML form/display
-            document.getElementById('childFirstNameHebrew').value = data.childFirstNameHebrew || '';
-            document.getElementById('childLastNameHebrew').value = data.childLastNameHebrew || '';
-            document.getElementById('childNameHebrewDisplay').textContent = hebrewName || childId;
-
-            // Reset and load sections
-            const sectionsContainer = document.getElementById('sectionsContainer');
-            sectionsContainer.innerHTML = '';
-            // sectionCounter = 0; // This variable might be global or managed elsewhere, keeping it out of this specific function unless explicitly needed here.
-
-            if (data.sections && Array.isArray(data.sections)) {
-                data.sections.forEach(sectionData => {
-                    addSection(sectionData.type, sectionData.data);
-                });
+        // View work
+        window.viewWork = function() {
+            if (currentChildId) {
+                window.open(`/#/${currentChildId}`, '_blank');
             } else {
-                sectionsContainer.innerHTML = '<p style="text-align: center; color: #777;">טרם נוספו מקטעים לעבודה זו.</p>';
+                showMessage('אין עבודה לצפייה. אנא צור או טען עבודה קודם.');
             }
-        } else {
-            // Document not found in Firebase
-            showMessage(`שגיאה: עבודה עם מזהה "${childId}" לא נמצאה. ייתכן שהיא נמחקה או שהכתובת שגויה.`, () => {
-                // Redirect to 404 or home page if work not found
-                window.location.href = '/404.html'; // Changed to direct redirect for 404 page
-            });
-        }
-    } catch (e) {
-        // Handle any errors during Firebase data retrieval
-        console.error("Error loading document: ", e);
-        showMessage('שגיאה בטעינת העבודה. אנא נסה שוב מאוחר יותר.', () => {
-            navigateHash('/'); // Assuming navigateHash is defined elsewhere
-        });
-    }
-}
+        };
+        // Display View
+        async function renderDisplayView(childId) {
+            const contentDiv = document.getElementById('app-content');
+            contentDiv.className = 'work-container';
+            contentDiv.innerHTML = `
+                <img id="workLogo" src="https://i.postimg.cc/nVNHjMqs/httpsshop-super-pharm-co-ilcarehair-carehair-filling-Agiva-Volumiz.png" alt="לוגו עבודת שורשים">
+                <h1 id="mainTitle">Powered By Amit Matyas</h1>
+                <h2 id="subTitle"></h2>
+                <div id="sectionsContainer"></div>
+            `;
+            document.getElementById('pageTitle').textContent = `עבודת שורשים - ${childId}`;
 
-// --- Update Child Name Display Function ---
-window.updateChildNameDisplay = async function() {
-    const firstNameHebrew = document.getElementById('childFirstNameHebrew').value;
-    const lastNameHebrew = document.getElementById('childLastNameHebrew').value;
-    const hebrewName = `${firstNameHebrew} ${lastNameHebrew}`.trim();
+            try {
+                const docRef = doc(db, "works", childId);
+                const docSnap = await getDoc(docRef);
 
-    // Update name in display
-    document.getElementById('childNameHebrewDisplay').textContent = hebrewName;
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('mainTitle').textContent = `עבודת שורשים`;
+                    document.getElementById('subTitle').textContent = `${data.childFirstNameHebrew || ''} ${data.childLastNameHebrew || ''}`.trim();
 
-    // Update page title
-    if (hebrewName) {
-        document.getElementById('pageTitle').textContent = `ניהול עבודת שורשים - ${hebrewName}`;
-    } else if (currentChildId) {
-        // If no Hebrew name, try to get it from Firebase
-        try {
-            const docRef = doc(db, "works", currentChildId);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                const savedHebrewName = `${data.childFirstNameHebrew || ''} ${data.childLastNameHebrew || ''}`.trim();
-                document.getElementById('pageTitle').textContent = savedHebrewName ?
-                    `ניהול עבודת שורשים - ${savedHebrewName}` :
-                    `ניהול עבודת שורשים - ${currentChildId}`;
+                    const sectionsContainer = document.getElementById('sectionsContainer');
+                    sectionsContainer.innerHTML = '';
+
+                    if (data.sections && Array.isArray(data.sections)) {
+                        data.sections.forEach(section => {
+                            const sectionDiv = document.createElement('div');
+                            sectionDiv.className = 'section-display';
+                            let contentHtml = '';
+
+                            const displayImage = (url, altText) => {
+                                if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+                                    return `
+                                        <div class="image-with-title">
+                                            <img src="${url}" alt="${altText}" style="max-width: 100%; max-height: 300px; object-fit: contain;">
+                                            <div class="image-title">${altText}</div>
+                                        </div>
+                                    `;
+                                }
+                                return '';
+                            };
+
+                            switch (section.type) {
+                                case 'firstName':
+                                    contentHtml = `
+                                        <h3>שם פרטי</h3>
+                                        <div class="section-content">
+                                            <p><strong>מקור:</strong> ${section.data.firstNameOrigin || 'לא הוזן'}</p>
+                                            <p><strong>משמעות:</strong> ${section.data.firstNameMeaning || 'לא הוזן'}</p>
+                                            <p><strong>תאריך לידה (עברי):</strong> ${section.data.birthDateHebrew || 'לא הוזן'}</p>
+                                            <p><strong>תאריך לידה (לועזי):</strong> ${section.data.birthDateGregorian || 'לא הוזן'}</p>
+                                            ${displayImage(section.data.babyPhotoUrl, 'תמונה כתינוק')}
+                                            ${displayImage(section.data.britInvitationUrl, 'הזמנה לברית')}
+                                            ${displayImage(section.data.birthCertificateUrl, 'תעודת לידה')}
+                                            <p><strong>מקום לידה:</strong> ${section.data.birthCountry || 'לא הוזן'}, ${section.data.birthCity || 'לא הוזן'}, ${section.data.birthHospital || 'לא הוזן'}</p>
+                                            <p><strong>סיפור סביב השם:</strong></p>
+                                            <p>${section.data.firstNameStory || 'לא הוזן'}</p>
+                                            <p><strong>כינוי חיבה:</strong> ${section.data.nicknameWho || 'לא הוזן'} ${section.data.nicknameWhy ? `כי ${section.data.nicknameWhy}` : ''}</p>
+                                            ${displayImage(section.data.firstNameSectionPhoto, 'תמונה נוספת')}
+                                        </div>
+                                    `;
+                                    break;
+                                case 'lastName':
+                                    contentHtml = `
+                                        <h3>שם משפחה</h3>
+                                        <div class="section-content">
+                                            <p><strong>מקור:</strong> ${section.data.lastNameOrigin || 'לא הוזן'}</p>
+                                            <p><strong>משמעות:</strong> ${section.data.lastNameMeaning || 'לא הוזן'}</p>
+                                            <p><strong>מאיזה שפה זה:</strong> ${section.data.lastNameLanguage || 'לא הוזן'}</p>
+                                            <p><strong>סיפור משפחתי סביב השם:</strong></p>
+                                            <p>${section.data.familyStoryAboutName || 'לא הוזן'}</p>
+                                            ${displayImage(section.data.lastNameSectionPhoto, 'תמונה')}
+                                        </div>
+                                    `;
+                                    break;
+                                case 'letterFromPast':
+                                    contentHtml = `
+                                        <h3>מכתב מהעבר</h3>
+                                        <div class="section-content">
+                                            <p>${section.data.letterContent || 'לא הוזן'}</p>
+                                            ${displayImage(section.data.letterFromPastPhoto, 'תמונה')}
+                                        </div>
+                                    `;
+                                    break;
+                                case 'familyID':
+                                    contentHtml = `
+                                        <h3>ת"ז משפחתית</h3>
+                                        <div class="section-content">
+                                            ${displayImage(section.data.familyIdPhoto, 'תמונה')}
+                                        </div>
+                                    `;
+                                    break;
+                                case 'interview':
+                                    contentHtml = `
+                                        <h3>ראיון</h3>
+                                        <div class="section-content">
+                                            <p><strong>שם:</strong> ${section.data.interviewName || 'לא הוזן'}</p>
+                                            <p><strong>קשר משפחתי:</strong> ${section.data.interviewRelationship || 'לא הוזן'}</p>
+                                            <p class="interview-text">
+                                                ${section.data.interviewText || 'לא הוזן'}
+                                            </p>
+                                        </div>
+                                    `;
+                                    break;
+                                case 'custom':
+                                    contentHtml = `
+                                        ${section.data.customTitle ? `<h3>${section.data.customTitle}</h3>` : ''}
+                                        <div class="section-content">
+                                            ${section.data.customContent || ''}
+                                            ${section.data.customSectionPhoto ? displayImage(section.data.customSectionPhoto, '') : ''}
+                                        </div>
+                                    `;
+                                    break;
+                                default:
+                                    contentHtml = `<p>סוג מקטע לא ידוע.</p>`;
+                            }
+                            sectionDiv.innerHTML = contentHtml;
+                            sectionsContainer.appendChild(sectionDiv);
+                        });
+                    } else {
+                        sectionsContainer.innerHTML = '<p style="text-align: center; color: #777;">טרם נוספו מקטעים לעבודה זו.</p>';
+                    }
+                } else {
+                    showMessage(`שגיאה: עבודה עם מזהה "${childId}" לא נמצאה. ייתכן שהיא נמחקה או שהכתובת שגויה.`, function() {
+                        navigateHash('/');
+                    });
+                }
+            } catch (e) {
+                console.error("Error loading document: ", e);
+                showMessage('שגיאה בטעינת העבודה. אנא נסה שוב מאוחר יותר.', function() {
+                    navigateHash('/');
+                });
             }
-        } catch (error) {
-            console.error("Error getting document:", error);
-            document.getElementById('pageTitle').textContent = `ניהול עבודת שורשים - ${currentChildId}`;
         }
-    }
-};
 
-// --- Image Upload Handling Function ---
-window.handleImageUpload = async function(event, fieldName, sectionDivId) {
-    const file = event.target.files[0];
-    if (!file) {
-        return;
-    }
+        window.updateChildNameDisplay = function() {
+            const firstNameHebrew = document.getElementById('childFirstNameHebrew').value;
+            const lastNameHebrew = document.getElementById('childLastNameHebrew').value;
+            document.getElementById('childNameHebrewDisplay').textContent = `${firstNameHebrew} ${lastNameHebrew}`.trim();
+        };
 
-    const inputId = event.target.id;
-    const statusSpan = document.getElementById(`status-${inputId}`);
-    const previewImg = document.getElementById(`preview-${inputId}`);
+        // Image upload handling
+        window.handleImageUpload = async function(event, fieldName, sectionDivId) {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
 
-    statusSpan.innerHTML = '<span class="loading-spinner"></span> מעלה...';
-    statusSpan.style.color = '#555';
+            const inputId = event.target.id;
+            const statusSpan = document.getElementById(`status-${inputId}`);
+            const previewImg = document.getElementById(`preview-${inputId}`);
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+            statusSpan.innerHTML = '<span class="loading-spinner"></span> מעלה...';
+            statusSpan.style.color = '#555';
 
-    try {
-        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-            method: 'POST',
-            body: formData
-        });
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
 
-        const data = await response.json();
+            try {
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
 
-        if (response.ok && data.secure_url) {
-            event.target.setAttribute('data-image-url', data.secure_url);
-            previewImg.src = data.secure_url;
-            previewImg.style.display = 'block';
-            previewImg.onerror = () => {
-                previewImg.style.display = 'none';
-                statusSpan.textContent = 'שגיאה בטעינת תצוגה מקדימה.';
-                statusSpan.style.color = 'orange';
-            };
+                const data = await response.json();
 
-            statusSpan.textContent = 'הועלה בהצלחה!';
-            statusSpan.style.color = 'green';
-        } else {
-            console.error('Cloudinary upload error:', data);
-            showMessage(`שגיאה בהעלאת התמונה: ${data.error ? data.error.message : 'שגיאה לא ידועה'}`);
-            statusSpan.textContent = 'שגיאה בהעלאה.';
-            statusSpan.style.color = 'red';
-        }
-    } catch (error) {
-        console.error('Network or unexpected error:', error);
-        showMessage('שגיאה בתקשורת עם שרת Cloudinary. אנא נסה שוב.');
-        statusSpan.textContent = 'שגיאה בהעלאה.';
-        statusSpan.style.color = 'red';
-    }
-};
+                if (response.ok && data.secure_url) {
+                    event.target.setAttribute('data-image-url', data.secure_url);
+                    previewImg.src = data.secure_url;
+                    previewImg.style.display = 'block';
+                    previewImg.onerror = () => {
+                        previewImg.style.display = 'none';
+                        statusSpan.textContent = 'שגיאה בטעינת תצוגה מקדימה.';
+                        statusSpan.style.color = 'orange';
+                    };
 
-// --- Remove Section Function ---
-window.removeSection = function(buttonElement) {
-    const sectionDiv = buttonElement.closest('.section-block');
-    if (sectionDiv) {
-        sectionDiv.remove();
-    }
-};
+                    statusSpan.textContent = 'הועלה בהצלחה!';
+                    statusSpan.style.color = 'green';
+                } else {
+                    console.error('Cloudinary upload error:', data);
+                    showMessage(`שגיאה בהעלאת התמונה: ${data.error ? data.error.message : 'שגיאה לא ידועה'}`);
+                    statusSpan.textContent = 'שגיאה בהעלאה.';
+                    statusSpan.style.color = 'red';
+                }
+            } catch (error) {
+                console.error('Network or unexpected error:', error);
+                showMessage('שגיאה בתקשורת עם שרת Cloudinary. אנא נסה שוב.');
+                statusSpan.textContent = 'שגיאה בהעלאה.';
+                statusSpan.style.color = 'red';
+            }
+        };
 
-// --- QR Code functions (assuming these are called by buttons in your HTML) ---
-window.printQrCode = function() {
-    // Add your QR code printing logic here
-    console.log("Printing QR code...");
-};
-
-window.hideQrCodePopup = function() {
-    document.getElementById('qrCodePopup').style.display = 'none';
-};
+        window.removeSection = function(buttonElement) {
+            const sectionDiv = buttonElement.closest('.section-block');
+            if (sectionDiv) {
+                sectionDiv.remove();
+            }
+        };
+    </script>
+</head>
+<body>
+    <div id="app-content"></div>
+    <div id="messageBox" class="message-box">
+        <p id="messageText"></p>
+        <button id="messageButton">אישור</button>
+    </div>
+    <div id="qrCodePopup" class="qr-code-popup">
+        <img id="qrCodeImage" src="" alt="QR Code"/>
+        <button onclick="printQrCode()">הדפס QR</button>
+        <button onclick="hideQrCodePopup()">סגור</button>
+    </div>
+</body>
+</html>
