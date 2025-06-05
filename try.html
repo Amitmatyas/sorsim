@@ -903,7 +903,17 @@
             }
         };
 
-// View work
+// --- Global Variables and Utility Functions (assuming these are defined elsewhere or will be) ---
+// Example:
+// let currentChildId = null;
+// const db = firebase.firestore(); // Assuming Firebase is initialized
+// const showMessage = (msg, callback) => { /* implementation */ };
+// const navigateHash = (hash) => { /* implementation */ };
+// const CLOUDINARY_CLOUD_NAME = 'your_cloud_name'; // Replace with your Cloudinary name
+// const CLOUDINARY_UPLOAD_PRESET = 'your_upload_preset'; // Replace with your Cloudinary upload preset
+
+
+// --- View Work Function ---
 window.viewWork = function() {
     if (currentChildId) {
         window.open(`/#/${currentChildId}`, '_blank');
@@ -912,7 +922,105 @@ window.viewWork = function() {
     }
 };
 
-// Display View
+// --- Display Image Helper Function ---
+const displayImage = (url, altText) => {
+    if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+        return `
+            <div class="image-with-title">
+                <img src="${url}" alt="${altText}" style="max-width: 100%; max-height: 300px; object-fit: contain;">
+                <div class="image-title">${altText}</div>
+            </div>
+        `;
+    }
+    return '';
+};
+
+// --- Add Section Helper Function (used by renderDisplayView) ---
+const addSection = (type, sectionData) => {
+    const sectionsContainer = document.getElementById('sectionsContainer'); // Get container inside this scope for safety
+    const sectionDiv = document.createElement('div');
+    sectionDiv.className = 'section-block'; // Apply a class for styling
+    let contentHtml = '';
+
+    switch (type) {
+        case 'firstName':
+            contentHtml = `
+                <h3>שם פרטי</h3>
+                <div class="section-content">
+                    <p><strong>מקור:</strong> ${sectionData.firstNameOrigin || 'לא הוזן'}</p>
+                    <p><strong>משמעות:</strong> ${sectionData.firstNameMeaning || 'לא הוזן'}</p>
+                    <p><strong>תאריך לידה (עברי):</strong> ${sectionData.birthDateHebrew || 'לא הוזן'}</p>
+                    <p><strong>תאריך לידה (לועזי):</strong> ${sectionData.birthDateGregorian || 'לא הוזן'}</p>
+                    ${displayImage(sectionData.babyPhotoUrl, 'תמונה כתינוק')}
+                    ${displayImage(sectionData.britInvitationUrl, 'הזמנה לברית')}
+                    ${displayImage(sectionData.birthCertificateUrl, 'תעודת לידה')}
+                    <p><strong>מקום לידה:</strong> ${sectionData.birthCountry || 'לא הוזן'}, ${sectionData.birthCity || 'לא הוזן'}, ${sectionData.birthHospital || 'לא הוזן'}</p>
+                    <p><strong>סיפור סביב השם:</strong></p>
+                    <p>${sectionData.firstNameStory || 'לא הוזן'}</p>
+                    <p><strong>כינוי חיבה:</strong> ${sectionData.nicknameWho || 'לא הוזן'} ${sectionData.nicknameWhy ? `כי ${sectionData.nicknameWhy}` : ''}</p>
+                    ${displayImage(sectionData.firstNameSectionPhoto, 'תמונה נוספת')}
+                </div>
+            `;
+            break;
+        case 'lastName':
+            contentHtml = `
+                <h3>שם משפחה</h3>
+                <div class="section-content">
+                    <p><strong>מקור:</strong> ${sectionData.lastNameOrigin || 'לא הוזן'}</p>
+                    <p><strong>משמעות:</strong> ${sectionData.lastNameMeaning || 'לא הוזן'}</p>
+                    <p><strong>מאיזה שפה זה:</strong> ${sectionData.lastNameLanguage || 'לא הוזן'}</p>
+                    <p><strong>סיפור משפחתי סביב השם:</strong></p>
+                    <p>${sectionData.familyStoryAboutName || 'לא הוזן'}</p>
+                    ${displayImage(sectionData.lastNameSectionPhoto, 'תמונה')}
+                </div>
+            `;
+            break;
+        case 'letterFromPast':
+            contentHtml = `
+                <h3>מכתב מהעבר</h3>
+                <div class="section-content">
+                    <p>${sectionData.letterContent || 'לא הוזן'}</p>
+                    ${displayImage(sectionData.letterFromPastPhoto, 'תמונה')}
+                </div>
+            `;
+            break;
+        case 'familyID':
+            contentHtml = `
+                <h3>ת"ז משפחתית</h3>
+                <div class="section-content">
+                    ${displayImage(sectionData.familyIdPhoto, 'תמונה')}
+                </div>
+            `;
+            break;
+        case 'interview':
+            contentHtml = `
+                <h3>ראיון</h3>
+                <div class="section-content">
+                    <p><strong>שם:</strong> ${sectionData.interviewName || 'לא הוזן'}</p>
+                    <p><strong>קשר משפחתי:</strong> ${sectionData.interviewRelationship || 'לא הוזן'}</p>
+                    <p class="interview-text">
+                        ${sectionData.interviewText || 'לא הוזן'}
+                    </p>
+                </div>
+            `;
+            break;
+        case 'custom':
+            contentHtml = `
+                ${sectionData.customTitle ? `<h3>${sectionData.customTitle}</h3>` : ''}
+                <div class="section-content">
+                    ${sectionData.customContent || ''}
+                    ${sectionData.customSectionPhoto ? displayImage(sectionData.customSectionPhoto, '') : ''}
+                </div>
+            `;
+            break;
+        default:
+            contentHtml = `<p>סוג מקטע לא ידוע.</p>`;
+    }
+    sectionDiv.innerHTML = contentHtml;
+    sectionsContainer.appendChild(sectionDiv);
+};
+
+// --- Main Display View Function ---
 async function renderDisplayView(childId) {
     const contentDiv = document.getElementById('app-content');
     contentDiv.className = 'work-container';
@@ -927,141 +1035,28 @@ async function renderDisplayView(childId) {
     document.getElementById('pageTitle').textContent = 'ניהול עבודת שורשים';
 
     try {
-        const docRef = doc(db, "works", childId);
-        const docSnap = await getDoc(docRef);
+        const docRef = doc(db, "works", childId); // Assuming 'db' is defined (e.g., from Firebase initialization)
+        const docSnap = await getDoc(docRef); // Assuming 'getDoc' is defined (e.g., from Firebase firestore)
 
         if (docSnap.exists()) {
             const data = docSnap.data();
             const hebrewName = `${data.childFirstNameHebrew || ''} ${data.childLastNameHebrew || ''}`.trim();
 
-            // עדכון כל הכותרות והתצוגות בדף
+            // Update all titles and displays on the page
             document.getElementById('pageTitle').textContent = hebrewName ?
                 `ניהול עבודת שורשים - ${hebrewName}` :
                 `ניהול עבודת שורשים - ${childId}`;
 
+            // Assuming these elements exist in your HTML form/display
             document.getElementById('childFirstNameHebrew').value = data.childFirstNameHebrew || '';
             document.getElementById('childLastNameHebrew').value = data.childLastNameHebrew || '';
             document.getElementById('childNameHebrewDisplay').textContent = hebrewName || childId;
 
-            // איפוס וטעינת המקטעים
+            // Reset and load sections
             const sectionsContainer = document.getElementById('sectionsContainer');
             sectionsContainer.innerHTML = '';
-            sectionCounter = 0;
+            // sectionCounter = 0; // This variable might be global or managed elsewhere, keeping it out of this specific function unless explicitly needed here.
 
-            const displayImage = (url, altText) => {
-                if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
-                    return `
-                        <div class="image-with-title">
-                            <img src="${url}" alt="${altText}" style="max-width: 100%; max-height: 300px; object-fit: contain;">
-                            <div class="image-title">${altText}</div>
-                        </div>
-                    `;
-                }
-                return '';
-            };
-
-            // This is the missing function and the loop that was problematic
-            const addSection = (type, sectionData) => {
-                const sectionDiv = document.createElement('div');
-                sectionDiv.className = 'section-block';
-                let contentHtml = '';
-
-                switch (type) {
-                    case 'firstName':
-                        contentHtml = `
-                            <h3>שם פרטי</h3>
-                            <div class="section-content">
-                                <p><strong>מקור:</strong> ${sectionData.firstNameOrigin || 'לא הוזן'}</p>
-                                <p><strong>משמעות:</strong> ${sectionData.firstNameMeaning || 'לא הוזן'}</p>
-                                <p><strong>תאריך לידה (עברי):</strong> ${sectionData.birthDateHebrew || 'לא הוזן'}</p>
-                                <p><strong>תאריך לידה (לועזי):</strong> ${sectionData.birthDateGregorian || 'לא הוזן'}</p>
-                                ${displayImage(sectionData.babyPhotoUrl, 'תמונה כתינוק')}
-                                ${displayImage(sectionData.britInvitationUrl, 'הזמנה לברית')}
-                                ${displayImage(sectionData.birthCertificateUrl, 'תעודת לידה')}
-                                <p><strong>מקום לידה:</strong> ${sectionData.birthCountry || 'לא הוזן'}, ${sectionData.birthCity || 'לא הוזן'}, ${sectionData.birthHospital || 'לא הוזן'}</p>
-                                <p><strong>סיפור סביב השם:</strong></p>
-                                <p>${sectionData.firstNameStory || 'לא הוזן'}</p>
-                                <p><strong>כינוי חיבה:</strong> ${sectionData.nicknameWho || 'לא הוזן'} ${sectionData.nicknameWhy ? `כי ${sectionData.nicknameWhy}` : ''}</p>
-                                ${displayImage(sectionData.firstNameSectionPhoto, 'תמונה נוספת')}
-                            </div>
-                        `;
-                        break;
-                    case 'lastName':
-                        contentHtml = `
-                            <h3>שם משפחה</h3>
-                            <div class="section-content">
-                                <p><strong>מקור:</strong> ${sectionData.lastNameOrigin || 'לא הוזן'}</p>
-                                <p><strong>משמעות:</strong> ${sectionData.lastNameMeaning || 'לא הוזן'}</p>
-                                <p><strong>מאיזה שפה זה:</strong> ${sectionData.lastNameLanguage || 'לא הוזן'}</p>
-                                <p><strong>סיפור משפחתי סביב השם:</strong></p>
-                                <p>${sectionData.familyStoryAboutName || 'לא הוזן'}</p>
-                                ${displayImage(sectionData.lastNameSectionPhoto, 'תמונה')}
-                            </div>
-                        `;
-                        break;
-                    case 'letterFromPast':
-                        contentHtml = `
-                            <h3>מכתב מהעבר</h3>
-                            <div class="section-content">
-                                <p>${sectionData.letterContent || 'לא הוזן'}</p>
-                                ${displayImage(sectionData.letterFromPastPhoto, 'תמונה')}
-                            </div>
-                        `;
-                        break;
-                    case 'familyID':
-                        contentHtml = `
-                            <h3>ת"ז משפחתית</h3>
-                            <div class="section-content">
-                                ${displayImage(sectionData.familyIdPhoto, 'תמונה')}
-                            </div>
-                        `;
-                        break;
-                    case 'interview':
-                        contentHtml = `
-                            <h3>ראיון</h3>
-                            <div class="section-content">
-                                <p><strong>שם:</strong> ${sectionData.interviewName || 'לא הוזן'}</p>
-                                <p><strong>קשר משפחתי:</strong> ${sectionData.interviewRelationship || 'לא הוזן'}</p>
-                                <p class="interview-text">
-                                    ${sectionData.interviewText || 'לא הוזן'}
-                                </p>
-                            </div>
-                        `;
-                        break;
-                    case 'custom':
-                        contentHtml = `
-                            ${sectionData.customTitle ? `<h3>${sectionData.customTitle}</h3>` : ''}
-                            <div class="section-content">
-                                ${sectionData.customContent || ''}
-                                ${sectionData.customSectionPhoto ? displayImage(sectionData.customSectionPhoto, '') : ''}
-                            </div>
-                        `;
-                        break;
-                    default:
-                        contentHtml = `<p>סוג מקטע לא ידוע.</p>`;
-                }
-                sectionDiv.innerHTML = contentHtml;
-                sectionsContainer.appendChild(sectionDiv);
-            };
-
-            if (data.sections && Array.isArray(data.sections)) {
-                data.sections.forEach(sectionData => {
-                    addSection(sectionData.type, sectionData.data);
-                });
-            }
-        } else {
-            showMessage(`שגיאה: עבודה עם מזהה "${childId}" לא נמצאה. ייתכן שהיא נמחקה או שהכתובת שגויה.`, () => {
-                window.location.href = '/404.html';
-            });
-        }
-    } catch (e) {
-        console.error("Error loading document: ", e);
-        showMessage('שגיאה בטעינת העבודה. אנא נסה שוב מאוחר יותר.', () => {
-            navigateHash('/');
-        });
-    }
-}
-// This is the correct placement for the else-block if `data.sections` is not an array
             if (data.sections && Array.isArray(data.sections)) {
                 data.sections.forEach(sectionData => {
                     addSection(sectionData.type, sectionData.data);
@@ -1069,32 +1064,36 @@ async function renderDisplayView(childId) {
             } else {
                 sectionsContainer.innerHTML = '<p style="text-align: center; color: #777;">טרם נוספו מקטעים לעבודה זו.</p>';
             }
-        } else { // This else corresponds to if (docSnap.exists())
-            showMessage(`שגיאה: עבודה עם מזהה "${childId}" לא נמצאה. ייתכן שהיא נמחקה או שהכתובת שגויה.`, function() {
-                navigateHash('/');
+        } else {
+            // Document not found in Firebase
+            showMessage(`שגיאה: עבודה עם מזהה "${childId}" לא נמצאה. ייתכן שהיא נמחקה או שהכתובת שגויה.`, () => {
+                // Redirect to 404 or home page if work not found
+                window.location.href = '/404.html'; // Changed to direct redirect for 404 page
             });
         }
-    } catch (e) { // This catch block corresponds to the try block around Firebase operations
+    } catch (e) {
+        // Handle any errors during Firebase data retrieval
         console.error("Error loading document: ", e);
-        showMessage('שגיאה בטעינת העבודה. אנא נסה שוב מאוחר יותר.', function() {
-            navigateHash('/');
+        showMessage('שגיאה בטעינת העבודה. אנא נסה שוב מאוחר יותר.', () => {
+            navigateHash('/'); // Assuming navigateHash is defined elsewhere
         });
     }
-} // This closing brace correctly closes the async function renderDisplayView(childId)
+}
 
+// --- Update Child Name Display Function ---
 window.updateChildNameDisplay = async function() {
     const firstNameHebrew = document.getElementById('childFirstNameHebrew').value;
     const lastNameHebrew = document.getElementById('childLastNameHebrew').value;
     const hebrewName = `${firstNameHebrew} ${lastNameHebrew}`.trim();
 
-    // עדכון שם בתצוגה
+    // Update name in display
     document.getElementById('childNameHebrewDisplay').textContent = hebrewName;
 
-    // עדכון כותרת הדף
+    // Update page title
     if (hebrewName) {
         document.getElementById('pageTitle').textContent = `ניהול עבודת שורשים - ${hebrewName}`;
     } else if (currentChildId) {
-        // אם אין שם בעברית, מנסה לקבל אותו מ-Firebase
+        // If no Hebrew name, try to get it from Firebase
         try {
             const docRef = doc(db, "works", currentChildId);
             const docSnap = await getDoc(docRef);
@@ -1112,7 +1111,7 @@ window.updateChildNameDisplay = async function() {
     }
 };
 
-// Image upload handling
+// --- Image Upload Handling Function ---
 window.handleImageUpload = async function(event, fieldName, sectionDivId) {
     const file = event.target.files[0];
     if (!file) {
@@ -1164,24 +1163,20 @@ window.handleImageUpload = async function(event, fieldName, sectionDivId) {
     }
 };
 
+// --- Remove Section Function ---
 window.removeSection = function(buttonElement) {
     const sectionDiv = buttonElement.closest('.section-block');
     if (sectionDiv) {
         sectionDiv.remove();
     }
 };
-    </script>
-</head>
-<body>
-    <div id="app-content"></div>
-    <div id="messageBox" class="message-box">
-        <p id="messageText"></p>
-        <button id="messageButton">אישור</button>
-    </div>
-    <div id="qrCodePopup" class="qr-code-popup">
-        <img id="qrCodeImage" src="" alt="QR Code"/>
-        <button onclick="printQrCode()">הדפס QR</button>
-        <button onclick="hideQrCodePopup()">סגור</button>
-    </div>
-</body>
-</html>
+
+// --- QR Code functions (assuming these are called by buttons in your HTML) ---
+window.printQrCode = function() {
+    // Add your QR code printing logic here
+    console.log("Printing QR code...");
+};
+
+window.hideQrCodePopup = function() {
+    document.getElementById('qrCodePopup').style.display = 'none';
+};
