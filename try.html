@@ -903,154 +903,164 @@
             }
         };
 
-        // View work
-        window.viewWork = function() {
-            if (currentChildId) {
-                window.open(`/#/${currentChildId}`, '_blank');
-            } else {
-                showMessage('אין עבודה לצפייה. אנא צור או טען עבודה קודם.');
+// View work
+window.viewWork = function() {
+    if (currentChildId) {
+        window.open(`/#/${currentChildId}`, '_blank');
+    } else {
+        showMessage('אין עבודה לצפייה. אנא צור או טען עבודה קודם.');
+    }
+};
+
+// Display View
+async function renderDisplayView(childId) {
+    const contentDiv = document.getElementById('app-content');
+    contentDiv.className = 'work-container';
+    contentDiv.innerHTML = `
+        <img id="workLogo" src="https://i.postimg.cc/nVNHjMqs/httpsshop-super-pharm-co-ilcarehair-carehair-filling-Agiva-Volumiz.png" alt="לוגו עבודת שורשים">
+        <h1 id="mainTitle">Powered By Amit Matyas</h1>
+        <h2 id="subTitle"></h2>
+        <div id="sectionsContainer"></div>
+    `;
+
+    currentChildId = childId;
+    document.getElementById('pageTitle').textContent = 'ניהול עבודת שורשים';
+
+    try {
+        const docRef = doc(db, "works", childId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            const hebrewName = `${data.childFirstNameHebrew || ''} ${data.childLastNameHebrew || ''}`.trim();
+
+            // עדכון כל הכותרות והתצוגות בדף
+            document.getElementById('pageTitle').textContent = hebrewName ?
+                `ניהול עבודת שורשים - ${hebrewName}` :
+                `ניהול עבודת שורשים - ${childId}`;
+
+            document.getElementById('childFirstNameHebrew').value = data.childFirstNameHebrew || '';
+            document.getElementById('childLastNameHebrew').value = data.childLastNameHebrew || '';
+            document.getElementById('childNameHebrewDisplay').textContent = hebrewName || childId;
+
+            // איפוס וטעינת המקטעים
+            const sectionsContainer = document.getElementById('sectionsContainer');
+            sectionsContainer.innerHTML = '';
+            sectionCounter = 0;
+
+            const displayImage = (url, altText) => {
+                if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+                    return `
+                        <div class="image-with-title">
+                            <img src="${url}" alt="${altText}" style="max-width: 100%; max-height: 300px; object-fit: contain;">
+                            <div class="image-title">${altText}</div>
+                        </div>
+                    `;
+                }
+                return '';
+            };
+
+            // This is the missing function and the loop that was problematic
+            const addSection = (type, sectionData) => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'section-block';
+                let contentHtml = '';
+
+                switch (type) {
+                    case 'firstName':
+                        contentHtml = `
+                            <h3>שם פרטי</h3>
+                            <div class="section-content">
+                                <p><strong>מקור:</strong> ${sectionData.firstNameOrigin || 'לא הוזן'}</p>
+                                <p><strong>משמעות:</strong> ${sectionData.firstNameMeaning || 'לא הוזן'}</p>
+                                <p><strong>תאריך לידה (עברי):</strong> ${sectionData.birthDateHebrew || 'לא הוזן'}</p>
+                                <p><strong>תאריך לידה (לועזי):</strong> ${sectionData.birthDateGregorian || 'לא הוזן'}</p>
+                                ${displayImage(sectionData.babyPhotoUrl, 'תמונה כתינוק')}
+                                ${displayImage(sectionData.britInvitationUrl, 'הזמנה לברית')}
+                                ${displayImage(sectionData.birthCertificateUrl, 'תעודת לידה')}
+                                <p><strong>מקום לידה:</strong> ${sectionData.birthCountry || 'לא הוזן'}, ${sectionData.birthCity || 'לא הוזן'}, ${sectionData.birthHospital || 'לא הוזן'}</p>
+                                <p><strong>סיפור סביב השם:</strong></p>
+                                <p>${sectionData.firstNameStory || 'לא הוזן'}</p>
+                                <p><strong>כינוי חיבה:</strong> ${sectionData.nicknameWho || 'לא הוזן'} ${sectionData.nicknameWhy ? `כי ${sectionData.nicknameWhy}` : ''}</p>
+                                ${displayImage(sectionData.firstNameSectionPhoto, 'תמונה נוספת')}
+                            </div>
+                        `;
+                        break;
+                    case 'lastName':
+                        contentHtml = `
+                            <h3>שם משפחה</h3>
+                            <div class="section-content">
+                                <p><strong>מקור:</strong> ${sectionData.lastNameOrigin || 'לא הוזן'}</p>
+                                <p><strong>משמעות:</strong> ${sectionData.lastNameMeaning || 'לא הוזן'}</p>
+                                <p><strong>מאיזה שפה זה:</strong> ${sectionData.lastNameLanguage || 'לא הוזן'}</p>
+                                <p><strong>סיפור משפחתי סביב השם:</strong></p>
+                                <p>${sectionData.familyStoryAboutName || 'לא הוזן'}</p>
+                                ${displayImage(sectionData.lastNameSectionPhoto, 'תמונה')}
+                            </div>
+                        `;
+                        break;
+                    case 'letterFromPast':
+                        contentHtml = `
+                            <h3>מכתב מהעבר</h3>
+                            <div class="section-content">
+                                <p>${sectionData.letterContent || 'לא הוזן'}</p>
+                                ${displayImage(sectionData.letterFromPastPhoto, 'תמונה')}
+                            </div>
+                        `;
+                        break;
+                    case 'familyID':
+                        contentHtml = `
+                            <h3>ת"ז משפחתית</h3>
+                            <div class="section-content">
+                                ${displayImage(sectionData.familyIdPhoto, 'תמונה')}
+                            </div>
+                        `;
+                        break;
+                    case 'interview':
+                        contentHtml = `
+                            <h3>ראיון</h3>
+                            <div class="section-content">
+                                <p><strong>שם:</strong> ${sectionData.interviewName || 'לא הוזן'}</p>
+                                <p><strong>קשר משפחתי:</strong> ${sectionData.interviewRelationship || 'לא הוזן'}</p>
+                                <p class="interview-text">
+                                    ${sectionData.interviewText || 'לא הוזן'}
+                                </p>
+                            </div>
+                        `;
+                        break;
+                    case 'custom':
+                        contentHtml = `
+                            ${sectionData.customTitle ? `<h3>${sectionData.customTitle}</h3>` : ''}
+                            <div class="section-content">
+                                ${sectionData.customContent || ''}
+                                ${sectionData.customSectionPhoto ? displayImage(sectionData.customSectionPhoto, '') : ''}
+                            </div>
+                        `;
+                        break;
+                    default:
+                        contentHtml = `<p>סוג מקטע לא ידוע.</p>`;
+                }
+                sectionDiv.innerHTML = contentHtml;
+                sectionsContainer.appendChild(sectionDiv);
+            };
+
+            if (data.sections && Array.isArray(data.sections)) {
+                data.sections.forEach(sectionData => {
+                    addSection(sectionData.type, sectionData.data);
+                });
             }
-        };
-        // Display View
-        async function renderDisplayView(childId) {
-            const contentDiv = document.getElementById('app-content');
-            contentDiv.className = 'work-container';
-            contentDiv.innerHTML = `
-                <img id="workLogo" src="https://i.postimg.cc/nVNHjMqs/httpsshop-super-pharm-co-ilcarehair-carehair-filling-Agiva-Volumiz.png" alt="לוגו עבודת שורשים">
-                <h1 id="mainTitle">Powered By Amit Matyas</h1>
-                <h2 id="subTitle"></h2>
-                <div id="sectionsContainer"></div>
-            `;
-currentChildId = childId;
-document.getElementById('pageTitle').textContent = 'ניהול עבודת שורשים';
-
-try {
-    const docRef = doc(db, "works", childId);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-        const data = docSnap.data();
-        const hebrewName = `${data.childFirstNameHebrew || ''} ${data.childLastNameHebrew || ''}`.trim();
-        
-        // עדכון כל הכותרות והתצוגות בדף
-        document.getElementById('pageTitle').textContent = hebrewName ? 
-            `ניהול עבודת שורשים - ${hebrewName}` : 
-            `ניהול עבודת שורשים - ${childId}`;
-            
-        document.getElementById('childFirstNameHebrew').value = data.childFirstNameHebrew || '';
-        document.getElementById('childLastNameHebrew').value = data.childLastNameHebrew || '';
-        document.getElementById('childNameHebrewDisplay').textContent = hebrewName || childId;
-
-        // איפוס וטעינת המקטעים
-        const sectionsContainer = document.getElementById('sectionsContainer');
-        sectionsContainer.innerHTML = '';
-        sectionCounter = 0;
-
-        if (data.sections && Array.isArray(data.sections)) {
-            data.sections.forEach(sectionData => {
-                addSection(sectionData.type, sectionData.data);
+        } else {
+            showMessage(`שגיאה: עבודה עם מזהה "${childId}" לא נמצאה. ייתכן שהיא נמחקה או שהכתובת שגויה.`, () => {
+                window.location.href = '/404.html';
             });
         }
-    } else {
-        showMessage(`שגיאה: עבודה עם מזהה "${childId}" לא נמצאה. ייתכן שהיא נמחקה או שהכתובת שגויה.`, () => {
-            window.location.href = '/404.html';
+    } catch (e) {
+        console.error("Error loading document: ", e);
+        showMessage('שגיאה בטעינת העבודה. אנא נסה שוב מאוחר יותר.', () => {
+            navigateHash('/');
         });
     }
-} catch (e) {
-    console.error("Error loading document: ", e);
-    showMessage('שגיאה בטעינת העבודה. אנא נסה שוב מאוחר יותר.', () => {
-        navigateHash('/');
-    });
 }
-                            const displayImage = (url, altText) => {
-                                if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
-                                    return `
-                                        <div class="image-with-title">
-                                            <img src="${url}" alt="${altText}" style="max-width: 100%; max-height: 300px; object-fit: contain;">
-                                            <div class="image-title">${altText}</div>
-                                        </div>
-                                    `;
-                                }
-                                return '';
-                            };
-
-                            switch (section.type) {
-                                case 'firstName':
-                                    contentHtml = `
-                                        <h3>שם פרטי</h3>
-                                        <div class="section-content">
-                                            <p><strong>מקור:</strong> ${section.data.firstNameOrigin || 'לא הוזן'}</p>
-                                            <p><strong>משמעות:</strong> ${section.data.firstNameMeaning || 'לא הוזן'}</p>
-                                            <p><strong>תאריך לידה (עברי):</strong> ${section.data.birthDateHebrew || 'לא הוזן'}</p>
-                                            <p><strong>תאריך לידה (לועזי):</strong> ${section.data.birthDateGregorian || 'לא הוזן'}</p>
-                                            ${displayImage(section.data.babyPhotoUrl, 'תמונה כתינוק')}
-                                            ${displayImage(section.data.britInvitationUrl, 'הזמנה לברית')}
-                                            ${displayImage(section.data.birthCertificateUrl, 'תעודת לידה')}
-                                            <p><strong>מקום לידה:</strong> ${section.data.birthCountry || 'לא הוזן'}, ${section.data.birthCity || 'לא הוזן'}, ${section.data.birthHospital || 'לא הוזן'}</p>
-                                            <p><strong>סיפור סביב השם:</strong></p>
-                                            <p>${section.data.firstNameStory || 'לא הוזן'}</p>
-                                            <p><strong>כינוי חיבה:</strong> ${section.data.nicknameWho || 'לא הוזן'} ${section.data.nicknameWhy ? `כי ${section.data.nicknameWhy}` : ''}</p>
-                                            ${displayImage(section.data.firstNameSectionPhoto, 'תמונה נוספת')}
-                                        </div>
-                                    `;
-                                    break;
-                                case 'lastName':
-                                    contentHtml = `
-                                        <h3>שם משפחה</h3>
-                                        <div class="section-content">
-                                            <p><strong>מקור:</strong> ${section.data.lastNameOrigin || 'לא הוזן'}</p>
-                                            <p><strong>משמעות:</strong> ${section.data.lastNameMeaning || 'לא הוזן'}</p>
-                                            <p><strong>מאיזה שפה זה:</strong> ${section.data.lastNameLanguage || 'לא הוזן'}</p>
-                                            <p><strong>סיפור משפחתי סביב השם:</strong></p>
-                                            <p>${section.data.familyStoryAboutName || 'לא הוזן'}</p>
-                                            ${displayImage(section.data.lastNameSectionPhoto, 'תמונה')}
-                                        </div>
-                                    `;
-                                    break;
-                                case 'letterFromPast':
-                                    contentHtml = `
-                                        <h3>מכתב מהעבר</h3>
-                                        <div class="section-content">
-                                            <p>${section.data.letterContent || 'לא הוזן'}</p>
-                                            ${displayImage(section.data.letterFromPastPhoto, 'תמונה')}
-                                        </div>
-                                    `;
-                                    break;
-                                case 'familyID':
-                                    contentHtml = `
-                                        <h3>ת"ז משפחתית</h3>
-                                        <div class="section-content">
-                                            ${displayImage(section.data.familyIdPhoto, 'תמונה')}
-                                        </div>
-                                    `;
-                                    break;
-                                case 'interview':
-                                    contentHtml = `
-                                        <h3>ראיון</h3>
-                                        <div class="section-content">
-                                            <p><strong>שם:</strong> ${section.data.interviewName || 'לא הוזן'}</p>
-                                            <p><strong>קשר משפחתי:</strong> ${section.data.interviewRelationship || 'לא הוזן'}</p>
-                                            <p class="interview-text">
-                                                ${section.data.interviewText || 'לא הוזן'}
-                                            </p>
-                                        </div>
-                                    `;
-                                    break;
-                                case 'custom':
-                                    contentHtml = `
-                                        ${section.data.customTitle ? `<h3>${section.data.customTitle}</h3>` : ''}
-                                        <div class="section-content">
-                                            ${section.data.customContent || ''}
-                                            ${section.data.customSectionPhoto ? displayImage(section.data.customSectionPhoto, '') : ''}
-                                        </div>
-                                    `;
-                                    break;
-                                default:
-                                    contentHtml = `<p>סוג מקטע לא ידוע.</p>`;
-                            }
-                            sectionDiv.innerHTML = contentHtml;
-                            sectionsContainer.appendChild(sectionDiv);
-                        });
                     } else {
                         sectionsContainer.innerHTML = '<p style="text-align: center; color: #777;">טרם נוספו מקטעים לעבודה זו.</p>';
                     }
