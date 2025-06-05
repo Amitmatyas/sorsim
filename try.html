@@ -633,7 +633,7 @@
                     <button onclick="hideQrCodePopup()">סגור</button>
                 </div>
             `;
-            document.getElementById('pageTitle').textContent = `ניהול עבודת שורשים - ${childNameHebrewDisplay}`;
+            document.getElementById('pageTitle').textContent = `ניהול עבודת שורשים - ${childid}`;
 
             try {
                 const docRef = doc(db, "works", childId);
@@ -922,7 +922,7 @@
                 <h2 id="subTitle"></h2>
                 <div id="sectionsContainer"></div>
             `;
-            document.getElementById('pageTitle').textContent = `עבודת שורשים - ${childNameHebrewDisplay}`;
+            document.getElementById('pageTitle').textContent = `עבודת שורשים - ${childid}`;
 
             try {
                 const docRef = doc(db, "works", childId);
