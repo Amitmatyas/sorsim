@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת ניהול Firebase</title>
+    <link rel="icon" type="image/png" href="data:image/png;base64,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">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --error-color: #ea4335;
+            --success-color: #34a853;
+            --background-color: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Heebo', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .collections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .collection-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .collection-item:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.02);
+        }
+
+        .document-list {
+            list-style: none;
+        }
+
+        .document-item {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .document-item:hover {
+            background: #f0f0f0;
+        }
+
+        .button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .button:hover {
+            background: #3367d6;
+        }
+
+        .input {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 1rem 2rem;
+            border-radius: 5px;
+            background: var(--success-color);
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
+        .error {
+            background: var(--error-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="header">מערכת ניהול Firebase</h1>
+        
+        <div class="card">
+            <h2>קולקציות זמינות</h2>
+            <div id="collections" class="collections-grid"></div>
+        </div>
+
+        <div class="card" id="documents-container" style="display: none;">
+            <h2>מסמכים בקולקציה: <span id="current-collection"></span></h2>
+            <div id="documents" class="document-list"></div>
+        </div>
+
+        <div class="card" id="rename-container" style="display: none;">
+            <h2>שינוי שם מסמך</h2>
+            <input type="text" id="new-name" class="input" placeholder="הכנס שם חדש למסמך">
+            <button id="rename-btn" class="button">שנה שם</button>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.x.x/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlyDbpwcBcWvFnvYHb84dMEpaQFTjv-HY",
+            authDomain: "tester-69fa9.firebaseapp.com",
+            projectId: "tester-69fa9",
+            storageBucket: "tester-69fa9.firebasestorage.app",
+            messagingSenderId: "378563229004",
+            appId: "1:378563229004:web:5136b724eb84fd00e44be9",
+            measurementId: "G-BFJ1QQM3MS"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let selectedDoc = null;
+        let selectedCollection = null;
+
+        // Show notification function
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            if (isError) notification.classList.add('error');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                if (isError) notification.classList.remove('error');
+            }, 3000);
+        }
+
+        // Fetch collections
+        async function fetchCollections() {
+            try {
+                const collectionsSnapshot = await getDocs(collection(db, '__collection_groups__'));
+                const collectionsDiv = document.getElementById('collections');
+                collectionsDiv.innerHTML = '';
+
+                collectionsSnapshot.forEach(col => {
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'collection-item';
+                    colDiv.textContent = col.id;
+                    colDiv.onclick = () => selectCollection(col.id);
+                    collectionsDiv.appendChild(colDiv);
+                });
+            } catch (error) {
+                showNotification('שגיאה בטעינת הקולקציות', true);
+                console.error("Error fetching collections:", error);
+            }
+        }
+
+        // Select collection
+        async function selectCollection(collectionId) {
+            selectedCollection = collectionId;
+            document.getElementById('current-collection').textContent = collectionId;
+            document.getElementById('documents-container').style.display = 'block';
+            
+            try {
+                const documentsSnapshot = await getDocs(collection(db, collectionId));
+                const documentsDiv = document.getElementById('documents');
+                documentsDiv.innerHTML = '';
+
+                documentsSnapshot.forEach(doc => {
+                    const docDiv = document.createElement('div');
+                    docDiv.className = 'document-item';
+                    docDiv.innerHTML = `
+                        <span>${doc.id}</span>
+                        <button class="button" onclick="selectDocument('${doc.id}')">שנה שם</button>
+                    `;
+                    documentsDiv.appendChild(docDiv);
+                });
+            } catch (error) {
+                showNotification('שגיאה בטעינת המסמכים', true);
+                console.error("Error fetching documents:", error);
+            }
+        }
+
+        // Select document
+        window.selectDocument = function(docId) {
+            selectedDoc = docId;
+            document.getElementById('rename-container').style.display = 'block';
+            document.getElementById('new-name').value = docId;
+        }
+
+        // Rename document
+        document.getElementById('rename-btn').onclick = async () => {
+            if (!selectedDoc || !selectedCollection) return;
+
+            const newName = document.getElementById('new-name').value.trim();
+            if (!newName) {
+                showNotification('אנא הכנס שם חדש למסמך', true);
+                return;
+            }
+
+            try {
+                const docRef = doc(db, selectedCollection, selectedDoc);
+                await updateDoc(docRef, { name: newName });
+                showNotification('שם המסמך שונה בהצלחה');
+                selectCollection(selectedCollection);
+            } catch (error) {
+                showNotification('שגיאה בשינוי שם המסמך', true);
+                console.error("Error renaming document:", error);
+            }
+        };
+
+        // Initialize
+        fetchCollections();
+    </script>
+</body>
+</html>
