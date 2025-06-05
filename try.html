@@ -952,13 +952,13 @@ try {
             });
         }
     } else {
-        showMessage(`שגיאה: עבודה עם מזהה "${childId}" לא נמצאה. ייתכן שהיא נמחקה או שהכתובת שגויה.`, function() {
+        showMessage(`שגיאה: עבודה עם מזהה "${childId}" לא נמצאה. ייתכן שהיא נמחקה או שהכתובת שגויה.`, () => {
             window.location.href = '/404.html';
         });
     }
 } catch (e) {
     console.error("Error loading document: ", e);
-    showMessage('שגיאה בטעינת העבודה. אנא נסה שוב מאוחר יותר.', function() {
+    showMessage('שגיאה בטעינת העבודה. אנא נסה שוב מאוחר יותר.', () => {
         navigateHash('/');
     });
 }
