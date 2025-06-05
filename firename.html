@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>שינוי שם מסמך ב-Firestore</title>
+    <!-- Favicon - Lightning Bolt SVG -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 2L3 14h9l-1 8 10-12h-9l1-8z'%3E%3C/path%3E%3C/svg%3E" type="image/svg+xml">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom CSS for animations and enhanced styling -->
+    <style>
+        /* Import Google Font - Inter for a modern look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+        /* Base styles for the body */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Prevent scroll on subtle background animations */
+            position: relative; /* Needed for pseudo-element background */
+            direction: ltr; /* Ensure Left-to-Right layout */
+        }
+
+        /* Subtle background animation */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Animated gradient for a vibrant feel */
+            background: linear-gradient(45deg, #e0f2fe, #eef2ff, #f3e8ff, #ede9fe);
+            background-size: 400% 400%; /* Larger background for animation */
+            animation: gradientBackground 15s ease infinite; /* Smooth, infinite animation */
+            z-index: 1; /* Behind content */
+        }
+
+        @keyframes gradientBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Main container styling for the form */
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px; /* More rounded corners */
+            padding: 40px;
+            /* Enhanced shadow for a floating effect */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 0 15px rgba(0, 0, 0, 0.05);
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid #e2e8f0; /* Subtle border */
+            position: relative;
+            z-index: 10; /* Ensure it's above the background animation */
+            animation: fadeInScale 0.7s ease-out forwards; /* Entry animation */
+        }
+
+        /* Animation for the container on load */
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Title specific animations */
+        h1 {
+            animation: textGlow 1.5s infinite alternate; /* Pulsing glow for the title */
+            text-shadow: 0 0 5px rgba(99, 102, 241, 0.5), 0 0 10px rgba(99, 102, 241, 0.3);
+        }
+
+        @keyframes textGlow {
+            from {
+                text-shadow: 0 0 5px rgba(99, 102, 241, 0.5), 0 0 10px rgba(99, 102, 241, 0.3);
+                transform: scale(1);
+            }
+            to {
+                text-shadow: 0 0 10px rgba(99, 102, 241, 0.7), 0 0 20px rgba(99, 102, 241, 0.5);
+                transform: scale(1.02);
+            }
+        }
+
+
+        /* Styling for input fields */
+        .input-field {
+            border: 1px solid #cbd5e1; /* Light grey border */
+            border-radius: 10px; /* Rounded input fields */
+            padding: 12px 16px;
+            font-size: 1rem;
+            color: #333;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease; /* Smooth transitions on focus */
+            text-align: left; /* Ensure text within inputs is LTR */
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #6366f1; /* Indigo focus border */
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.4), 0 0 15px rgba(99, 102, 241, 0.2); /* Stronger glow on focus */
+            transform: translateY(-2px); /* Slight lift on focus */
+        }
+
+        /* Styling for labels */
+        label {
+            text-align: left; /* Ensure labels align left */
+        }
+
+        /* Styling for the primary button */
+        .btn-primary {
+            /* Vibrant gradient background */
+            background: linear-gradient(135deg, #6366f1, #8b5cf6); /* Indigo to Violet */
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px; /* More rounded button */
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease; /* Smooth transitions for hover effects */
+            /* Deep shadow for a prominent look */
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3), 0 4px 6px rgba(99, 102, 241, 0.1);
+            position: relative; /* For ripple effect */
+            overflow: hidden; /* For ripple effect */
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-3px); /* Subtle lift effect on hover */
+            /* More intense shadow on hover */
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4), 0 6px 10px rgba(99, 102, 241, 0.2);
+            /* Slightly different gradient on hover for visual feedback */
+            background: linear-gradient(135deg, #7c3aed, #a78bfa);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(1px) scale(0.98); /* Press down effect on click */
+            box-shadow: 0 5px 10px rgba(99, 102, 241, 0.2);
+            transition: transform 0.1s ease-out; /* Quick transition for click */
+        }
+
+        .btn-primary:disabled {
+            background: #a5b4fc; /* Lighter disabled state */
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Ripple effect for button click */
+        .btn-primary .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7); /* White ripple */
+            animation: ripple-animation 0.6s linear forwards;
+            transform: scale(0);
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        @keyframes ripple-animation {
+            from {
+                transform: scale(0);
+                opacity: 1;
+            }
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+
+        /* Styling for message display boxes */
+        .message-box {
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 25px;
+            animation: slideInUpPulse 0.8s ease-out forwards; /* Message entry animation with pulse */
+        }
+
+        /* Animation for message boxes - combines slide in with a subtle pulse */
+        @keyframes slideInUpPulse {
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            70% {
+                opacity: 1;
+                transform: translateY(0) scale(1.02); /* Slight overshoot */
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .message-box.success {
+            background-color: #d1fae5; /* Green 100 */
+            color: #065f46; /* Green 700 */
+            border: 1px solid #34d399; /* Green 300 */
+        }
+
+        .message-box.error {
+            background-color: #fee2e2; /* Red 100 */
+            color: #991b1b; /* Red 700 */
+            border: 1px solid #f87171; /* Red 300 */
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 640px) {
+            .container {
+                padding: 25px;
+                border-radius: 15px;
+            }
+            .btn-primary {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+            .input-field {
+                padding: 10px 14px;
+            }
+            h1 {
+                font-size: 2rem; /* Adjust title size for smaller screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-extrabold text-gray-800 mb-8 text-center leading-tight">
+            ⚡️ שינוי שם מסמך ב-Firestore ⚡️
+        </h1>
+
+        <p class="text-sm text-gray-600 mb-6 text-center">
+            משתמש מחובר (ID): <span id="userIdDisplay" class="font-semibold text-blue-700 break-all text-xs">טוען...</span>
+        </p>
+
+        <div class="mb-5">
+            <label for="collectionName" class="block text-gray-700 text-sm font-bold mb-2">
+                שם האוסף (Collection Name):
+            </label>
+            <input
+                type="text"
+                id="collectionName"
+                class="input-field w-full"
+                placeholder="לדוגמה: users"
+            />
+        </div>
+
+        <div class="mb-5">
+            <label for="oldDocId" class="block text-gray-700 text-sm font-bold mb-2">
+                ID של המסמך הישן:
+            </label>
+            <input
+                type="text"
+                id="oldDocId"
+                class="input-field w-full"
+                placeholder="לדוגמה: user123"
+            />
+        </div>
+
+        <div class="mb-8">
+            <label for="newDocId" class="block text-gray-700 text-sm font-bold mb-2">
+                ID חדש למסמך:
+            </label>
+            <input
+                type="text"
+                id="newDocId"
+                class="input-field w-full"
+                placeholder="לדוגמה: new_user456"
+            />
+        </div>
+
+        <button
+            id="renameButton"
+            class="btn-primary w-full"
+            disabled
+        >
+            שנה שם מסמך
+        </button>
+
+        <div id="messageDisplay" class="message-box hidden"></div>
+
+        <p class="text-xs text-gray-500 mt-8 text-center">
+            *שים לב: קוד זה משנה מסמך בנתיב פרטי: `/artifacts/{appId}/users/{userId}/{collectionName}/{docId}`.
+            וודא שיש לך הרשאות כתיבה וקריאה מתאימות ב-Firestore Security Rules.
+        </p>
+    </div>
+
+    <!-- Firebase SDKs - Loaded as ES Modules -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Your web app's Firebase configuration - provided by the user
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlyDbpwcBcWvFnvYHb84dMEpaQFTjv-HY",
+            authDomain: "tester-69fa9.firebaseapp.com",
+            projectId: "tester-69fa9",
+            storageBucket: "tester-69fa9.firebasestorage.app",
+            messagingSenderId: "378563229004",
+            appId: "1:378563229004:web:5136b724eb84fd00e44be9",
+            measurementId: "G-BFJ1QQM3MS"
+        };
+
+        // Global variables for Firebase instances
+        let db;
+        let auth;
+        let currentUserId = null;
+        let isFirebaseReady = false;
+
+        // Global variable for the app ID, provided by the Canvas environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // Get references to HTML elements
+        const collectionNameInput = document.getElementById('collectionName');
+        const oldDocIdInput = document.getElementById('oldDocId');
+        const newDocIdInput = document.getElementById('newDocId');
+        const renameButton = document.getElementById('renameButton');
+        const messageDisplay = document.getElementById('messageDisplay');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+
+        /**
+         * Displays a message to the user in the message box.
+         * @param {string} message - The message text.
+         * @param {boolean} isError - True if it's an error message, false for success/info.
+         */
+        function showMessage(message, isError = false) {
+            messageDisplay.textContent = message;
+            messageDisplay.classList.remove('hidden', 'success', 'error'); // Remove previous classes
+            messageDisplay.classList.add(isError ? 'error' : 'success'); // Add new class
+        }
+
+        /**
+         * Initializes Firebase app, Firestore, and Authentication.
+         * Authenticates the user.
+         */
+        async function initializeFirebase() {
+            try {
+                // Initialize Firebase with the provided config
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Get the initial auth token from the environment, if available
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+                // Authenticate the user
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth); // Sign in anonymously if no custom token
+                }
+
+                // Set the current user ID, falling back to a random UUID if not available
+                currentUserId = auth.currentUser?.uid || crypto.randomUUID();
+                userIdDisplay.textContent = currentUserId; // Display user ID in the UI
+                showMessage('Firebase אוסף ומתחבר בהצלחה.', false); // Success message
+                isFirebaseReady = true; // Mark Firebase as ready
+                renameButton.disabled = false; // Enable button once Firebase is ready
+            } catch (error) {
+                console.error("שגיאה באתחול Firebase או בהתחברות:", error);
+                showMessage(`שגיאה באתחול/התחברות ל-Firebase: ${error.message}`, true); // Error message
+                renameButton.disabled = true; // Keep button disabled on error
+            }
+        }
+
+        /**
+         * Adds a ripple effect to the button on click.
+         * @param {Event} e - The click event.
+         */
+        function createRipple(e) {
+            const button = e.currentTarget;
+            const ripple = document.createElement('span');
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+
+            ripple.style.width = ripple.style.height = `${diameter}px`;
+            ripple.style.left = `${e.clientX - button.offsetLeft - radius}px`;
+            ripple.style.top = `${e.clientY - button.offsetTop - radius}px`;
+            ripple.classList.add('ripple');
+
+            const existingRipple = button.querySelector('.ripple');
+            if (existingRipple) {
+                existingRipple.remove(); // Remove previous ripple if exists
+            }
+            button.appendChild(ripple);
+        }
+
+        /**
+         * Handles the document renaming process.
+         * Reads the old document, creates a new one with the new ID, and then deletes the old one.
+         */
+        async function handleRenameDocument() {
+            // Check if Firebase is initialized and user is authenticated
+            if (!isFirebaseReady || !db || !currentUserId) {
+                showMessage('שגיאה: Firebase אינו מאותחל או שאין משתמש.', true);
+                return;
+            }
+            // Validate input fields
+            if (!collectionNameInput.value || !oldDocIdInput.value || !newDocIdInput.value) {
+                showMessage('אנא מלא את כל השדות: שם אוסף, ID ישן ו-ID חדש.', true);
+                return;
+            }
+
+            renameButton.disabled = true; // Disable button during operation
+            showMessage('מבצע שינוי...'); // Show loading message
+
+            try {
+                const collectionName = collectionNameInput.value;
+                const oldDocId = oldDocIdInput.value;
+                const newDocId = newDocIdInput.value;
+
+                // Construct the document references based on the app's security rules.
+                // This example uses a private user-specific path: `/artifacts/{appId}/users/{userId}/{collectionName}/{docId}`.
+                // For public data shared across users, you would use: `/artifacts/{appId}/public/data/{collectionName}/{docId}`.
+                const oldDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/${collectionName}`, oldDocId);
+                const newDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/${collectionName}`, newDocId);
+
+                // 1. Read the old document data
+                const oldDocSnap = await getDoc(oldDocRef);
+
+                // Check if the old document exists
+                if (!oldDocSnap.exists()) {
+                    showMessage(`שגיאה: המסמך '${oldDocId}' באוסף '${collectionName}' לא נמצא.`, true);
+                    return; // Stop execution if document not found
+                }
+
+                const oldDocData = oldDocSnap.data(); // Get the data from the old document
+
+                // 2. Create a new document with the new ID and the old data
+                await setDoc(newDocRef, oldDocData);
+
+                // 3. Delete the old document
+                await deleteDoc(oldDocRef);
+
+                // Success message
+                showMessage(`המסמך '${oldDocId}' שונה בהצלחה ל- '${newDocId}' באוסף '${collectionName}'.`, false);
+            } catch (error) {
+                // Log and display any errors during the process
+                console.error("שגיאה בשינוי שם המסמך:", error);
+                showMessage(`שגיאה בשינוי שם המסמך: ${error.message}`, true);
+            } finally {
+                renameButton.disabled = false; // Re-enable the button regardless of success or failure
+            }
+        }
+
+        // Add event listeners when the DOM content is fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeFirebase(); // Initialize Firebase when the page loads
+            renameButton.addEventListener('click', (e) => {
+                createRipple(e); // Create ripple effect on click
+                handleRenameDocument(); // Then handle the document rename
+            });
+        });
+    </script>
+</body>
+</html>
