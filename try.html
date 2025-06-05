@@ -397,7 +397,7 @@
         // Firebase config
         const firebaseConfig = {
             apiKey: "AIzaSyDlyDbpwcBcWvFnvYHb84dMEpaQFTjv-HY",
-            authDomain: "tester-69fa9.firebaseapp.com",
+            authDomain: "tester-69fa9.firebaseapp.com", 
             projectId: "tester-69fa9",
             storageBucket: "tester-69fa9.appspot.com",
             messagingSenderId: "378563229004",
@@ -435,6 +435,77 @@
             };
         }
 
+        // Updated formatText function for custom section formatting
+        window.formatText = function(command, button) {
+            const sectionDiv = button.closest('.section-block');
+            const textarea = sectionDiv.querySelector('textarea[name="customContent"]');
+            
+            textarea.focus();
+            
+            // Get the selected text
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value.substring(start, end);
+            
+            // Apply formatting based on command
+            let formattedText;
+            switch(command) {
+                case 'bold':
+                    formattedText = `<strong>${text}</strong>`;
+                    break;
+                case 'italic':
+                    formattedText = `<em>${text}</em>`;
+                    break;
+                case 'underline':
+                    formattedText = `<u>${text}</u>`;
+                    break;
+                case 'insertUnorderedList':
+                    formattedText = `<ul><li>${text.split('\n').join('</li><li>')}</li></ul>`;
+                    break;
+                case 'insertOrderedList':
+                    formattedText = `<ol><li>${text.split('\n').join('</li><li>')}</li></ol>`;
+                    break;
+            }
+            
+            // Replace selected text with formatted text
+            textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+        };
+
+        // Updated handlePaste function for interview section
+        window.handlePaste = function(event) {
+            event.preventDefault();
+            
+            let content = '';
+            
+            // Try to get HTML content first
+            if (event.clipboardData.types.includes('text/html')) {
+                content = event.clipboardData.getData('text/html');
+            } else {
+                // If no HTML, get plain text and convert newlines to <br>
+                content = event.clipboardData.getData('text/plain')
+                    .replace(/\n/g, '<br>');
+            }
+            
+            // Clean and sanitize the HTML
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            
+            // Keep only allowed formatting tags
+            const allowedTags = ['b', 'strong', 'i', 'em', 'u', 'br', 'p', 'ul', 'ol', 'li'];
+            const cleanContent = Array.from(tempDiv.querySelectorAll('*'))
+                .filter(el => allowedTags.includes(el.tagName.toLowerCase()))
+                .map(el => el.outerHTML)
+                .join('');
+            
+            // Insert the cleaned content
+            document.execCommand('insertHTML', false, cleanContent || content);
+        };
+
+        function navigateHash(path) {
+            window.location.hash = path;
+        }
+
+        // Handle URL hash changes
         async function handleLocationHash() {
             const hash = window.location.hash;
             const contentDiv = document.getElementById('app-content');
@@ -454,12 +525,10 @@
                 currentChildId = displayMatch[1];
                 await renderDisplayView(currentChildId);
             } else {
-                window.location.href = '/404.html'; // Redirects directly to the 404.html page
+                window.location.href = '/404.html';
             }
         }
-        function navigateHash(path) {
-            window.location.hash = path;
-        }
+
         window.addEventListener('hashchange', handleLocationHash);
         document.addEventListener('DOMContentLoaded', handleLocationHash);
 
@@ -522,8 +591,7 @@
                 showMessage('שגיאה ביצירת העבודה או בגישה אליה. אנא נסה שוב מאוחר יותר.');
             }
         };
-
-        // Admin View
+                // Admin View
         async function renderAdminView(childId) {
             const contentDiv = document.getElementById('app-content');
             contentDiv.className = 'admin-container';
@@ -588,7 +656,7 @@
                     }
                 } else {
                     showMessage(`שגיאה: עבודה עם מזהה "${childId}" לא נמצאה. ייתכן שהיא נמחקה או שהכתובת שגויה.`, function() {
-                    window.location.href = '/404.html'; // This will navigate directly to 404.html
+                        window.location.href = '/404.html';
                     });
                 }
             } catch (e) {
@@ -599,45 +667,7 @@
             }
         }
 
-        function updateChildNameDisplay() {
-            const firstNameHebrew = document.getElementById('childFirstNameHebrew').value;
-            const lastNameHebrew = document.getElementById('childLastNameHebrew').value;
-            document.getElementById('childNameHebrewDisplay').textContent = `${firstNameHebrew} ${lastNameHebrew}`.trim();
-        }
-
-        // QR Code Popup Functions
-        window.showQrCodePopup = function() {
-            const workUrl = `${window.location.origin}/#/${currentChildId}`;
-            const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(workUrl)}&ecLevel=L&margin=2&size=200&centerImageUrl=https%3A%2F%2Fi.postimg.cc%2FnVNHjMqs%2Fhttpsshop-super-pharm-co-ilcarehair-carehair-filling-Agiva-Volumiz.png`;
-            document.getElementById('qrCodeImage').src = qrCodeUrl;
-            document.getElementById('qrCodePopup').style.display = 'block';
-        };
-
-        window.hideQrCodePopup = function() {
-            document.getElementById('qrCodePopup').style.display = 'none';
-        };
-
-        window.printQrCode = function() {
-            const qrCodeImage = document.getElementById('qrCodeImage');
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>הדפסת QR קוד</title>
-                    <style>
-                        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-                        img { max-width: 300px; max-height: 300px; }
-                    </style>
-                </head>
-                <body>
-                    <img src="${qrCodeImage.src}" alt="QR Code" onload="setTimeout(function() { window.print(); window.close(); }, 500);" />
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-        };
-
-        // ADD SECTION FUNCTION AS REQUESTED
+        // Add Section Function
         window.addSection = function(type, savedData = {}) {
             sectionCounter++;
             const sectionsContainer = document.getElementById('sectionsContainer');
@@ -724,6 +754,7 @@
                         ${createImageUploadField('lastNameSectionPhoto', 'העלאת תמונה', savedData.lastNameSectionPhoto)}
                     `;
                     break;
+
                 case 'letterFromPast':
                     sectionContent = `
                         <h3 class="section-title">מכתב מהעבר</h3>
@@ -734,12 +765,14 @@
                         ${createImageUploadField('letterFromPastPhoto', 'העלאת תמונה', savedData.letterFromPastPhoto)}
                     `;
                     break;
+
                 case 'familyID':
                     sectionContent = `
                         <h3 class="section-title">ת"ז משפחתית</h3>
                         ${createImageUploadField('familyIdPhoto', 'העלאת תמונה', savedData.familyIdPhoto)}
                     `;
                     break;
+
                 case 'interview':
                     sectionContent = `
                         <h3 class="section-title">ראיון</h3>
@@ -751,13 +784,20 @@
                         </div>
                         <div class="section-field" style="width:100%;">
                             <label>טקסט:</label>
-                            <textarea name="interviewText" rows="8" style="width:100%;" onpaste="handlePaste(event)"></textarea>
+                            <textarea name="interviewText" rows="8" style="width:100%;" 
+                                     contenteditable="true" 
+                                     onpaste="handlePaste(event)">${savedData.interviewText || ''}</textarea>
                         </div>
                     `;
                     break;
+
                 case 'custom':
                     sectionContent = `
-                        <h3 class="section-title">${savedData.customTitle ? savedData.customTitle : ''}</h3>
+                        <h3 class="section-title">מקטע מותאם אישית</h3>
+                        <div class="section-field" style="width:100%;">
+                            <label>כותרת:</label>
+                            <input type="text" name="customTitle" value="${savedData.customTitle || ''}">
+                        </div>
                         <div class="formatting-buttons">
                             <button type="button" onclick="formatText('bold', this)">מודגש</button>
                             <button type="button" onclick="formatText('italic', this)">נטוי</button>
@@ -767,11 +807,12 @@
                         </div>
                         <div class="section-field" style="width:100%;">
                             <label>תוכן:</label>
-                            <textarea name="customContent" rows="4" style="width:100%;"></textarea>
+                            <textarea name="customContent" rows="4" style="width:100%;">${savedData.customContent || ''}</textarea>
                         </div>
                         ${createImageUploadField('customSectionPhoto', 'העלאת תמונה', savedData.customSectionPhoto)}
                     `;
                     break;
+
                 default:
                     sectionContent = `<p>סוג מקטע לא ידוע.</p>`;
             }
@@ -783,79 +824,36 @@
             sectionsContainer.appendChild(sectionDiv);
         };
 
-        // Image upload to Cloudinary
-        window.handleImageUpload = async function(event, fieldName, sectionDivId) {
-            const file = event.target.files[0];
-            if (!file) {
-                return;
-            }
-
-            const inputId = event.target.id;
-            const statusSpan = document.getElementById(`status-${inputId}`);
-            const previewImg = document.getElementById(`preview-${inputId}`);
-
-            statusSpan.innerHTML = '<span class="loading-spinner"></span> מעלה...';
-            statusSpan.style.color = '#555';
-
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-
-            try {
-                const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-            const data = await response.json();
-
-                if (response.ok && data.secure_url) {
-                    event.target.setAttribute('data-image-url', data.secure_url);
-                    previewImg.src = data.secure_url;
-                    previewImg.style.display = 'block';
-                    previewImg.onerror = () => {
-                        previewImg.style.display = 'none';
-                        statusSpan.textContent = 'שגיאה בטעינת תצוגה מקדימה.';
-                        statusSpan.style.color = 'orange';
-                    };
-
-                    statusSpan.textContent = 'הועלה בהצלחה!';
-                    statusSpan.style.color = 'green';
-                } else {
-                    console.error('Cloudinary upload error:', data);
-                    showMessage(`שגיאה בהעלאת התמונה: ${data.error ? data.error.message : 'שגיאה לא ידועה'}`);
-                    statusSpan.textContent = 'שגיאה בהעלאה.';
-                    statusSpan.style.color = 'red';
-                }
-            } catch (error) {
-                console.error('Network or unexpected error:', error);
-                showMessage('שגיאה בתקשורת עם שרת Cloudinary. אנא נסה שוב.');
-                statusSpan.textContent = 'שגיאה בהעלאה.';
-                statusSpan.style.color = 'red';
-            }
+        // QR Code Functions
+        window.showQrCodePopup = function() {
+            const workUrl = `${window.location.origin}/#/${currentChildId}`;
+            const qrCodeUrl = `https://quickchart.io/qr?text=${encodeURIComponent(workUrl)}&ecLevel=L&margin=2&size=200&centerImageUrl=https%3A%2F%2Fi.postimg.cc%2FnVNHjMqs%2Fhttpsshop-super-pharm-co-ilcarehair-carehair-filling-Agiva-Volumiz.png`;
+            document.getElementById('qrCodeImage').src = qrCodeUrl;
+            document.getElementById('qrCodePopup').style.display = 'block';
         };
 
-        // Remove section
-        window.removeSection = function(buttonElement) {
-            const sectionDiv = buttonElement.closest('.section-block');
-            if (sectionDiv) {
-                sectionDiv.remove();
-            }
+        window.hideQrCodePopup = function() {
+            document.getElementById('qrCodePopup').style.display = 'none';
         };
 
-        // Handle paste event for interview section
-        window.handlePaste = function(event) {
-            event.preventDefault();
-            const text = event.clipboardData.getData('text/html') || event.clipboardData.getData('text/plain');
-            document.execCommand('insertHTML', false, text);
-        };
-
-        // Format text in custom section
-        window.formatText = function(command, button) {
-            const sectionDiv = button.closest('.section-block');
-            const textarea = sectionDiv.querySelector('textarea[name="customContent"]');
-            textarea.focus();
-            document.execCommand(command, false, null);
+        window.printQrCode = function() {
+            const qrCodeImage = document.getElementById('qrCodeImage');
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>הדפסת QR קוד</title>
+                    <style>
+                        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+                        img { max-width: 300px; max-height: 300px; }
+                    </style>
+                </head>
+                <body>
+                    <img src="${qrCodeImage.src}" alt="QR Code" onload="setTimeout(function() { window.print(); window.close(); }, 500);" />
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
         };
 
         // Save work
@@ -864,6 +862,7 @@
                 showMessage('שגיאה: לא נמצא מזהה ילד לשמירה.');
                 return;
             }
+
             const childFirstNameHebrew = document.getElementById('childFirstNameHebrew').value.trim();
             const childLastNameHebrew = document.getElementById('childLastNameHebrew').value.trim();
 
@@ -916,7 +915,6 @@
                 showMessage('אין עבודה לצפייה. אנא צור או טען עבודה קודם.');
             }
         };
-
         // Display View
         async function renderDisplayView(childId) {
             const contentDiv = document.getElementById('app-content');
@@ -1051,6 +1049,71 @@
                 });
             }
         }
+
+        window.updateChildNameDisplay = function() {
+            const firstNameHebrew = document.getElementById('childFirstNameHebrew').value;
+            const lastNameHebrew = document.getElementById('childLastNameHebrew').value;
+            document.getElementById('childNameHebrewDisplay').textContent = `${firstNameHebrew} ${lastNameHebrew}`.trim();
+        };
+
+        // Image upload handling
+        window.handleImageUpload = async function(event, fieldName, sectionDivId) {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            const inputId = event.target.id;
+            const statusSpan = document.getElementById(`status-${inputId}`);
+            const previewImg = document.getElementById(`preview-${inputId}`);
+
+            statusSpan.innerHTML = '<span class="loading-spinner"></span> מעלה...';
+            statusSpan.style.color = '#555';
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+            try {
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.secure_url) {
+                    event.target.setAttribute('data-image-url', data.secure_url);
+                    previewImg.src = data.secure_url;
+                    previewImg.style.display = 'block';
+                    previewImg.onerror = () => {
+                        previewImg.style.display = 'none';
+                        statusSpan.textContent = 'שגיאה בטעינת תצוגה מקדימה.';
+                        statusSpan.style.color = 'orange';
+                    };
+
+                    statusSpan.textContent = 'הועלה בהצלחה!';
+                    statusSpan.style.color = 'green';
+                } else {
+                    console.error('Cloudinary upload error:', data);
+                    showMessage(`שגיאה בהעלאת התמונה: ${data.error ? data.error.message : 'שגיאה לא ידועה'}`);
+                    statusSpan.textContent = 'שגיאה בהעלאה.';
+                    statusSpan.style.color = 'red';
+                }
+            } catch (error) {
+                console.error('Network or unexpected error:', error);
+                showMessage('שגיאה בתקשורת עם שרת Cloudinary. אנא נסה שוב.');
+                statusSpan.textContent = 'שגיאה בהעלאה.';
+                statusSpan.style.color = 'red';
+            }
+        };
+
+        window.removeSection = function(buttonElement) {
+            const sectionDiv = buttonElement.closest('.section-block');
+            if (sectionDiv) {
+                sectionDiv.remove();
+            }
+        };
     </script>
 </head>
 <body>
