@@ -243,7 +243,7 @@
                     const qrApiUrl = `https://quickchart.io/qr?text=${encodedUrl}&ecLevel=L&margin=2&size=200&centerImageUrl=${centerImageUrl}`;
 
                     qrCodeImage.src = qrApiUrl; // Set the source of the QR code image
-                    currentQrCodeUrl = qrApiUrl; // Store the URL
+                    currentQrCodeUrl = qrApiUrl; // Store the URL for printing
 
                     qrCodeContainer.classList.remove('hidden');
                     printButton.classList.remove('hidden');
@@ -265,11 +265,22 @@
 
             printButton.addEventListener('click', () => {
                 if (currentQrCodeUrl) {
-                    const printWindow = window.open(currentQrCodeUrl, '_blank');
-                    // Wait for the new window to load the image before printing
-                    printWindow.onload = () => {
-                        printWindow.print();
-                    };
+                    const printWindow = window.open('', '_blank'); // Open a blank new window
+                    printWindow.document.write(`
+                        <html>
+                        <head>
+                            <title>הדפסת קוד QR</title>
+                            <style>
+                                body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+                                img { max-width: 95%; max-height: 95vh; display: block; }
+                            </style>
+                        </head>
+                        <body>
+                            <img src="${currentQrCodeUrl}" onload="window.print(); window.close();">
+                        </body>
+                        </html>
+                    `);
+                    printWindow.document.close(); // Close the document stream
                 } else {
                     alert('אנא צור קוד QR קודם כל.');
                 }
