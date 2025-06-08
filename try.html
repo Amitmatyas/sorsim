@@ -201,43 +201,6 @@
                 transform: scale(1);
             }
         }
-
-        /* Print styles */
-        @media print {
-            body {
-                margin: 0;
-                background: none;
-            }
-            /* Hide all elements except the qrCodeImage (which is inside qrCodeContainer) */
-            body > *:not(#qrCodeContainer) {
-                display: none !important;
-            }
-            #qrCodeContainer {
-                display: flex !important; /* Ensure it's visible for printing */
-                position: fixed; /* Use fixed to cover the whole page */
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: white; /* Clean white background */
-                align-items: center;
-                justify-content: center;
-                margin: 0; /* Remove margin for print */
-                padding: 0; /* Remove padding for print */
-                box-shadow: none; /* Remove shadow for print */
-                border: none; /* Remove border for print */
-                opacity: 1 !important; /* Ensure visibility for print */
-                animation: none !important; /* Disable animations for print */
-            }
-            #qrCodeContainer img {
-                max-width: 90%;
-                max-height: 90%;
-                width: auto;
-                height: auto;
-                opacity: 1 !important; /* Ensure visibility for print */
-                animation: none !important; /* Disable animations for print */
-            }
-        }
     </style>
 </head>
 <body>
@@ -269,6 +232,8 @@
             const qrCodeImage = document.getElementById('qrCodeImage');
             const printButton = document.getElementById('printButton');
 
+            let currentQrCodeUrl = ''; // Variable to store the generated QR code URL
+
             generateQrButton.addEventListener('click', () => {
                 const workUrl = linkInput.value.trim();
 
@@ -278,6 +243,7 @@
                     const qrApiUrl = `https://quickchart.io/qr?text=${encodedUrl}&ecLevel=L&margin=2&size=200&centerImageUrl=${centerImageUrl}`;
 
                     qrCodeImage.src = qrApiUrl; // Set the source of the QR code image
+                    currentQrCodeUrl = qrApiUrl; // Store the URL
 
                     qrCodeContainer.classList.remove('hidden');
                     printButton.classList.remove('hidden');
@@ -298,7 +264,15 @@
             });
 
             printButton.addEventListener('click', () => {
-                window.print();
+                if (currentQrCodeUrl) {
+                    const printWindow = window.open(currentQrCodeUrl, '_blank');
+                    // Wait for the new window to load the image before printing
+                    printWindow.onload = () => {
+                        printWindow.print();
+                    };
+                } else {
+                    alert('אנא צור קוד QR קודם כל.');
+                }
             });
         });
     </script>
