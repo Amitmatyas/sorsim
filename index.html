@@ -606,6 +606,7 @@
                         <button onclick="addSection('lastName')">שם משפחה</button>
                         <button onclick="addSection('letterFromPast')">מכתב מהעבר</button>
                         <button onclick="addSection('familyID')">ת"ז משפחתית</button>
+                        <button onclick="addSection('Ai')">תוצר ויזואלי - Ai</button>
                         <button onclick="addSection('interview')">ראיון</button>
                         <button onclick="addSection('custom')">מקטע מותאם אישית</button>
                     </div>
@@ -766,6 +767,13 @@
                     sectionContent = `
                         <h3 class="section-title">ת"ז משפחתית</h3>
                         ${createImageUploadField('familyIdPhoto', 'העלאת תמונה', savedData.familyIdPhoto)}
+                    `;
+                    break;
+
+                case 'Ai':
+                    sectionContent = `
+                        <h3 class="section-title">ת"ז משפחתית</h3>
+                        ${createImageUploadField('AiPhoto', 'העלאת תמונה', savedData.AiPhoto)}
                     `;
                     break;
 
@@ -999,6 +1007,14 @@
                                         <h3>ת"ז משפחתית</h3>
                                         <div class="section-content">
                                             ${displayImage(section.data.familyIdPhoto, '')}
+                                        </div>
+                                    `;
+                                    break;
+                                case 'Ai':
+                                    contentHtml = `
+                                        <h3>תוצר ויזואלי - Ai</h3>
+                                        <div class="section-content">
+                                            ${displayImage(section.data.AiPhoto, '')}
                                         </div>
                                     `;
                                     break;
