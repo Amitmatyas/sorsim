@@ -59,7 +59,7 @@
             text-align: right;
             box-sizing: border-box;
             font-family: 'Heebo', sans-serif;
-            direction: rtl; /* Right-align input fields */
+            direction: rtl;
         }
         button {
             background-color: #007bff;
@@ -308,7 +308,7 @@
             border-right: 5px solid #eee;
             border-radius: 5px;
             text-align: right;
-            direction: rtl; /* Right-align section display */
+            direction: rtl;
         }
         .section-display h3 {
             color: #0056b3;
@@ -322,7 +322,7 @@
         .section-content p {
             margin-bottom: 10px;
             font-size: 1.1em;
-            text-align: right; /* Right-align paragraphs */
+            text-align: right;
         }
         .section-content strong {
             color: #333;
@@ -359,19 +359,19 @@
             margin: 0 auto 20px;
         }
         .interview-text {
-            white-space: pre-wrap; /* Preserve formatting, handle line breaks */
-            text-align: right; /* Right-align interview text */
+            white-space: pre-wrap;
+            text-align: right;
             direction: rtl;
         }
         .image-with-title {
-            text-align: center; /* Center the image and title */
+            text-align: center;
         }
         .image-with-title img {
-            max-width: 100%; /* Make image responsive */
-            max-height: 300px; /* Set a maximum height */
-            object-fit: contain; /* Maintain aspect ratio and fit within the container */
-            display: block; /* Remove extra space below image */
-            margin: 0 auto; /* Center the image horizontally */
+            max-width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
         }
         .image-title {
             font-size: 1.2em;
@@ -418,7 +418,6 @@
         let currentChildId = '';
         let sectionCounter = 0;
 
-        // Message box
         function showMessage(message, callback = null) {
             const messageBox = document.getElementById('messageBox');
             const messageText = document.getElementById('messageText');
@@ -435,19 +434,13 @@
             };
         }
 
-        // Updated formatText function for custom section formatting
         window.formatText = function(command, button) {
             const sectionDiv = button.closest('.section-block');
             const textarea = sectionDiv.querySelector('textarea[name="customContent"]');
-            
             textarea.focus();
-            
-            // Get the selected text
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
             const text = textarea.value.substring(start, end);
-            
-            // Apply formatting based on command
             let formattedText;
             switch(command) {
                 case 'bold':
@@ -466,38 +459,24 @@
                     formattedText = `<ol><li>${text.split('\n').join('</li><li>')}</li></ol>`;
                     break;
             }
-            
-            // Replace selected text with formatted text
             textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
         };
 
-        // Updated handlePaste function for interview section
         window.handlePaste = function(event) {
             event.preventDefault();
-            
             let content = '';
-            
-            // Try to get HTML content first
             if (event.clipboardData.types.includes('text/html')) {
                 content = event.clipboardData.getData('text/html');
             } else {
-                // If no HTML, get plain text and convert newlines to <br>
-                content = event.clipboardData.getData('text/plain')
-                    .replace(/\n/g, '<br>');
+                content = event.clipboardData.getData('text/plain').replace(/\n/g, '<br>');
             }
-            
-            // Clean and sanitize the HTML
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = content;
-            
-            // Keep only allowed formatting tags
             const allowedTags = ['b', 'strong', 'i', 'em', 'u', 'br', 'p', 'ul', 'ol', 'li'];
             const cleanContent = Array.from(tempDiv.querySelectorAll('*'))
                 .filter(el => allowedTags.includes(el.tagName.toLowerCase()))
                 .map(el => el.outerHTML)
                 .join('');
-            
-            // Insert the cleaned content
             document.execCommand('insertHTML', false, cleanContent || content);
         };
 
@@ -505,7 +484,6 @@
             window.location.hash = path;
         }
 
-        // Handle URL hash changes
         async function handleLocationHash() {
             const hash = window.location.hash;
             const contentDiv = document.getElementById('app-content');
@@ -532,7 +510,6 @@
         window.addEventListener('hashchange', handleLocationHash);
         document.addEventListener('DOMContentLoaded', handleLocationHash);
 
-        // Create Form
         function renderCreateForm() {
             const contentDiv = document.getElementById('app-content');
             contentDiv.className = 'create-form-container';
@@ -549,27 +526,21 @@
             document.getElementById('pageTitle').textContent = 'יצירת עבודת שורשים חדשה';
         }
 
-        // Create work
         window.createWork = async function() {
             const childFirstNameEnglish = document.getElementById('childFirstNameEnglish').value.trim();
             const childLastNameEnglish = document.getElementById('childLastNameEnglish').value.trim();
-
             if (!childFirstNameEnglish || !childLastNameEnglish) {
                 showMessage('אנא הזן גם שם פרטי וגם שם משפחה באנגלית.');
                 return;
             }
-
             const childId = `${childFirstNameEnglish}-${childLastNameEnglish}`;
-
             if (!/^[a-zA-Z0-9_-]+$/.test(childId)) {
                 showMessage('שם הילד באנגלית יכול להכיל אותיות באנגלית, מספרים, קו תחתון ומקף בלבד.');
                 return;
             }
-
             try {
                 const docRef = doc(db, "works", childId);
                 const docSnap = await getDoc(docRef);
-
                 if (docSnap.exists()) {
                     showMessage('עבודה עם שם זה כבר קיימת. מועבר לעמוד הניהול הקיים.', function() {
                         navigateHash(`/${childId}/admin`);
@@ -591,7 +562,7 @@
                 showMessage('שגיאה ביצירת העבודה או בגישה אליה. אנא נסה שוב מאוחר יותר.');
             }
         };
-        // Admin View
+
         async function renderAdminView(childId) {
             const contentDiv = document.getElementById('app-content');
             contentDiv.className = 'admin-container';
@@ -607,6 +578,7 @@
                         <button onclick="addSection('letterFromPast')">מכתב מהעבר</button>
                         <button onclick="addSection('familyID')">ת"ז משפחתית</button>
                         <button onclick="addSection('Ai')">תוצר ויזואלי - Ai</button>
+                        <button onclick="addSection('treeImage')">עץ שורשים (תמונה בלבד)</button>
                         <button onclick="addSection('interview')">ראיון</button>
                         <button onclick="addSection('custom')">מקטע מותאם אישית</button>
                     </div>
@@ -635,21 +607,17 @@
                 </div>
             `;
             document.getElementById('pageTitle').textContent = `ניהול עבודת שורשים - ${childId}`;
-
             try {
                 const docRef = doc(db, "works", childId);
                 const docSnap = await getDoc(docRef);
-
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     document.getElementById('childFirstNameHebrew').value = data.childFirstNameHebrew || '';
                     document.getElementById('childLastNameHebrew').value = data.childLastNameHebrew || '';
                     updateChildNameDisplay();
-
                     const sectionsContainer = document.getElementById('sectionsContainer');
                     sectionsContainer.innerHTML = '';
                     sectionCounter = 0;
-
                     if (data.sections && Array.isArray(data.sections)) {
                         data.sections.forEach(sectionData => {
                             addSection(sectionData.type, sectionData.data);
@@ -668,7 +636,6 @@
             }
         }
 
-        // Add Section Function
         window.addSection = function(type, savedData = {}) {
             sectionCounter++;
             const sectionsContainer = document.getElementById('sectionsContainer');
@@ -750,6 +717,7 @@
                         <div class="section-field"><label>סיפור משפחתי סביב השם:</label>
                             <textarea name="familyStoryAboutName">${savedData.familyStoryAboutName || ''}</textarea>
                         </div>
+                        ${createImageUploadField('lastNameSectionPhoto', 'העלאת תמונה', savedData.lastNameSectionPhoto)}
                     `;
                     break;
 
@@ -772,8 +740,15 @@
 
                 case 'Ai':
                     sectionContent = `
-                        <h3 class="section-title">ת"ז משפחתית</h3>
+                        <h3 class="section-title">תוצר ויזואלי - Ai</h3>
                         ${createImageUploadField('AiPhoto', 'העלאת תמונה', savedData.AiPhoto)}
+                    `;
+                    break;
+
+                case 'treeImage':
+                    sectionContent = `
+                        <h3 class="section-title">עץ שורשים (תמונה בלבד)</h3>
+                        ${createImageUploadField('treeImagePhoto', 'העלאת תמונה של עץ שורשים', savedData.treeImagePhoto)}
                     `;
                     break;
 
@@ -860,7 +835,6 @@
             printWindow.document.close();
         };
 
-        // Save work
         window.saveWork = async function() {
             if (!currentChildId) {
                 showMessage('שגיאה: לא נמצא מזהה ילד לשמירה.');
@@ -911,7 +885,6 @@
             }
         };
 
-        // View work
         window.viewWork = function() {
             if (currentChildId) {
                 window.open(`/#/${currentChildId}`, '_blank');
@@ -919,7 +892,7 @@
                 showMessage('אין עבודה לצפייה. אנא צור או טען עבודה קודם.');
             }
         };
-        // Display View
+
         async function renderDisplayView(childId) {
             const contentDiv = document.getElementById('app-content');
             contentDiv.className = 'work-container';
@@ -971,12 +944,11 @@
                                             <p><strong>תאריך לידה (עברי):</strong> ${section.data.birthDateHebrew || 'לא הוזן'}</p>
                                             <p><strong>תאריך לידה (לועזי):</strong> ${section.data.birthDateGregorian || 'לא הוזן'}</p>
                                             ${displayImage(section.data.babyPhotoUrl, 'תמונה כתינוק')}
-                                            ${section.data.britInvitationUrl ? `<img src="${section.data.britInvitationUrl}" alt="הזמנה לברית" style="max-width: 100%; height: auto;">` : ''}                                            ${displayImage(section.data.birthCertificateUrl, 'תעודת לידה')}
+                                            ${displayImage(section.data.birthCertificateUrl, 'תעודת לידה')}
                                             <p><strong>מקום לידה:</strong> ${section.data.birthCountry || 'לא הוזן'}, ${section.data.birthCity || 'לא הוזן'}, ${section.data.birthHospital || 'לא הוזן'}</p>
                                             <p><strong>סיפור סביב השם:</strong></p>
                                             <p>${section.data.firstNameStory || 'לא הוזן'}</p>
                                             <p><strong>כינוי חיבה:</strong> ${section.data.nicknameWho || 'לא הוזן'} ${section.data.nicknameWhy ? `כי ${section.data.nicknameWhy}` : ''}</p>
-                                            ${displayImage(section.data.firstNameSectionPhoto, 'תמונה נוספת')}
                                         </div>
                                     `;
                                     break;
@@ -989,7 +961,7 @@
                                             <p><strong>מאיזה שפה זה:</strong> ${section.data.lastNameLanguage || 'לא הוזן'}</p>
                                             <p><strong>סיפור משפחתי סביב השם:</strong></p>
                                             <p>${section.data.familyStoryAboutName || 'לא הוזן'}</p>
-                                            ${displayImage(section.data.lastNameSectionPhoto, '')}
+                                            ${displayImage(section.data.lastNameSectionPhoto, 'תמונה')}
                                         </div>
                                     `;
                                     break;
@@ -998,7 +970,6 @@
                                         <h3>מכתב מהעבר</h3>
                                         <div class="section-content">
                                             <p>${section.data.letterContent || 'לא הוזן'}</p>
-                                            ${displayImage(section.data.letterFromPastPhoto, '')}
                                         </div>
                                     `;
                                     break;
@@ -1006,7 +977,7 @@
                                     contentHtml = `
                                         <h3>ת"ז משפחתית</h3>
                                         <div class="section-content">
-                                            ${displayImage(section.data.familyIdPhoto, '')}
+                                            ${displayImage(section.data.familyIdPhoto, 'תמונה')}
                                         </div>
                                     `;
                                     break;
@@ -1014,7 +985,15 @@
                                     contentHtml = `
                                         <h3>תוצר ויזואלי - Ai</h3>
                                         <div class="section-content">
-                                            ${displayImage(section.data.AiPhoto, '')}
+                                            ${displayImage(section.data.AiPhoto, 'Ai')}
+                                        </div>
+                                    `;
+                                    break;
+                                case 'treeImage':
+                                    contentHtml = `
+                                        <h3>עץ שורשים (תמונה בלבד)</h3>
+                                        <div class="section-content">
+                                            ${displayImage(section.data.treeImagePhoto, 'עץ שורשים')}
                                         </div>
                                     `;
                                     break;
@@ -1067,7 +1046,6 @@
             document.getElementById('childNameHebrewDisplay').textContent = `${firstNameHebrew} ${lastNameHebrew}`.trim();
         };
 
-        // Image upload handling
         window.handleImageUpload = async function(event, fieldName, sectionDivId) {
             const file = event.target.files[0];
             if (!file) {
