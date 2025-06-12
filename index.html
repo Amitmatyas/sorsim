@@ -959,7 +959,7 @@
                                             <p><strong>מאיזה שפה זה:</strong> ${section.data.lastNameLanguage || 'לא הוזן'}</p>
                                             <p><strong>סיפור משפחתי סביב השם:</strong></p>
                                             <p>${section.data.familyStoryAboutName || 'לא הוזן'}</p>
-                                            ${displayImage(section.data.lastNameSectionPhoto, 'תמונה')}
+                                            ${displayImage(section.data.lastNameSectionPhoto, '')}
                                         </div>
                                     `;
                                     break;
@@ -975,7 +975,7 @@
                                     contentHtml = `
                                         <h3>ת"ז משפחתית</h3>
                                         <div class="section-content">
-                                            ${displayImage(section.data.familyIdPhoto, 'תמונה')}
+                                            ${displayImage(section.data.familyIdPhoto, '')}
                                         </div>
                                     `;
                                     break;
@@ -983,7 +983,7 @@
                                     contentHtml = `
                                         <h3>תוצר ויזואלי - Ai</h3>
                                         <div class="section-content">
-                                            ${displayImage(section.data.AiPhoto, 'Ai')}
+                                            ${displayImage(section.data.AiPhoto, '')}
                                         </div>
                                     `;
                                     break;
@@ -991,7 +991,7 @@
                                     contentHtml = `
                                         <h3>עץ שורשים</h3>
                                         <div class="section-content">
-                                            ${displayImage(section.data.treeImagePhoto, 'עץ שורשים')}
+                                            ${displayImage(section.data.treeImagePhoto, '')}
                                         </div>
                                     `;
                                     break;
